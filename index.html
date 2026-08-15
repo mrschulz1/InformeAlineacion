@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe de Alineación - Alineaciones Bustamante</title>
+    <!--cargar libreria con supabase-->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <style>
+        :root {
+            --primary: #1b365d;
+            --primary-dark: #0f2341;
+            --accent-red: #d32f2f;
+            --accent-green: #2e7d32;
+            --bg-light: #f8fafc;
+            --border-color: #cbd5e1;
+            --text-dark: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #e2e8f0;
+            color: var(--text-dark);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Action Toolbar */
+        .toolbar {
+            width: 100%;
+            max-width: 900px;
+            background: #ffffff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toolbar-title {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* Paper Document Sheet */
+        .document-page {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            padding: 15mm;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15);
+            border-radius: 2px;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        /* Header Section */
+        .header {
+            display: grid;
+            grid-template-columns: 1fr 180px;
+            gap: 15px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+
+        .company-info-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-placeholder {
+            width: 80px;
+            height: 80px;
+            background: var(--bg-light);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+            text-align: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .company-details h1 {
+            color: var(--primary);
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .company-details p {
+            font-size: 0.82rem;
+            color: #475569;
+            line-height: 1.3;
+        }
+
+        .folio-box {
+            border: 2px solid var(--accent-red);
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+            background-color: #fef2f2;
+        }
+
+        .folio-box label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--accent-red);
+            text-transform: uppercase;
+        }
+
+        .folio-box input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--accent-red);
+            outline: none;
+        }
+
+        /* Section Title Bar */
+        .section-header {
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 6px;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        /* Data Grid Table */
+        .client-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px 12px;
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field-group.span-2 {
+            grid-column: span 2;
+        }
+
+        .field-group label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .field-group input {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0f172a;
+            outline: none;
+            background-color: white;
+        }
+
+        .field-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(27, 54, 93, 0.15);
+        }
+
+        /* Technical Alignment Diagram Section */
+        .diagram-container {
+            display: grid;
+            grid-template-columns: 200px 1fr 200px;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .center-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            gap: 10px;
+        }
+
+        .car-vector {
+            width: 100%;
+            max-width: 220px;
+            height: auto;
+            margin: 5px 0;
+        }
+
+        /* Measurement Cards */
+        .wheel-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 8px;
+        }
+
+        .wheel-card-header {
+            background-color: var(--primary);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .wheel-card-body {
+            padding: 6px 8px;
+        }
+
+        .measure-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            margin-bottom: 4px;
+        }
+
+        .measure-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .measure-row span {
+            font-weight: 700;
+            color: #475569;
+            width: 50px;
+        }
+
+        .measure-row input {
+            width: 100px;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            padding: 3px 6px;
+            font-size: 0.8rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        /* Status Boxes */
+        .status-box {
+            width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .status-box-header {
+            background: var(--primary);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px;
+        }
+
+        .status-box-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: white;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .status-box-body label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .status-box-body input {
+            width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            padding: 2px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-badge-select {
+            width: 100%;
+            padding: 4px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        .badge-red {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-green {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        /* Observaciones */
+        .notes-section {
+            margin-bottom: 12px;
+        }
+
+        .notes-section label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .notes-section textarea {
+            width: 100%;
+            height: 70px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #1e293b;
+            background-color: #fffbeb;
+            resize: none;
+            outline: none;
+            line-height: 1.4;
+        }
+
+        /* Warranty Footer */
+        .warranty-banner {
+            background-color: #fef08a;
+            border: 1px solid #facc15;
+            color: #854d0e;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* Print Media Styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .toolbar {
+                display: none !important;
+            }
+
+            .document-page {
+                box-shadow: none;
+                padding: 10mm;
+                width: 100%;
+                min-height: auto;
+            }
+
+            input, textarea, select {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                appearance: none;
+                -webkit-appearance: none;
+            }
+
+            .badge-red {
+                background-color: #fee2e2 !important;
+                color: #991b1b !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .badge-green {
+                background-color: #dcfce7 !important;
+                color: #166534 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .section-header, .wheel-card-header, .status-box-header {
+                background-color: var(--primary) !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .folio-box {
+                background-color: #fef2f2 !important;
+                border-color: var(--accent-red) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .warranty-banner {
+                background-color: #fef08a !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Action Bar / Web Controls -->
+    <div class="toolbar">
+        <div class="toolbar-title">Talonario Digital - Informe de Alineación</div>
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="fillExampleData()">Cargar Ejemplo</button>
+            <button class="btn btn-secondary" onclick="clearForm()">Limpiar</button>
+            <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+        </div>
+    </div>
+
+    <!-- Printable Sheet -->
+    <div class="document-page">
+        <!-- Header -->
+        <div class="header">
+            <div class="company-info-container">
+                <div class="logo-placeholder">
+                    <span>ALINEACIONES<br>BUSTAMANTE</span>
+                </div>
+                <div class="company-details">
+                    <h1>ALINEACIONES BUSTAMANTE</h1>
+                    <p><strong>Dirección:</strong> AV. Gral. Bustamante N° 640, Ñuñoa, Santiago</p>
+                    <p><strong>Teléfono:</strong> +56 2 2904 8965 | <strong>WhatsApp:</strong> +56 9 8577 9851</p>
+                    <p><strong>Web:</strong> www.alineaciones.cl</p>
+                </div>
+            </div>
+            <div class="folio-box">
+                <label>FOLIO N°</label>
+                <input type="text" id="folio" value="13.456">
+            </div>
+        </div>
+
+        <div class="section-header">Informe de Alineación</div>
+
+        <!-- Client & Vehicle Info Grid -->
+        <div class="client-grid">
+            <div class="field-group">
+                <label>RUT</label>
+                <input type="text" id="rut" placeholder="12.345.678-K">
+            </div>
+            <div class="field-group span-2">
+                <label>FECHA</label>
+                <input type="text" id="fecha">
+            </div>
+            <div class="field-group">
+                <label>PATENTE</label>
+                <input type="text" id="patente" placeholder="HJGS60">
+            </div>
+
+            <div class="field-group span-2">
+                <label>NOMBRE / RAZÓN SOCIAL</label>
+                <input type="text" id="nombre" placeholder="Nombre del cliente">
+            </div>
+            <div class="field-group">
+                <label>MARCA</label>
+                <input type="text" id="marca" placeholder="FORD">
+            </div>
+            <div class="field-group">
+                <label>MODELO</label>
+                <input type="text" id="modelo" placeholder="EXPLORER 2.3 ECOBOOST">
+            </div>
+
+            <div class="field-group">
+                <label>AÑO</label>
+                <input type="text" id="ano" placeholder="2015">
+            </div>
+            <div class="field-group span-2">
+                <label>N° CHASIS (VIN)</label>
+                <input type="text" id="chasis" placeholder="1FM5K8F85FGC31151">
+            </div>
+            <div class="field-group">
+                <label>DOCUMENTO</label>
+                <input type="text" id="documento" placeholder="S/N">
+            </div>
+        </div>
+
+        <!-- Wheel Alignment Measurements Grid -->
+        <div class="diagram-container">
+            <!-- Left Side Controls (Front Left & Rear Left) -->
+            <div>
+                <!-- Camber Front Left -->
+                <div class="wheel-card">
+                    <div class="wheel-card-header">CAMBER DELANTERO IZQ (F-L)</div>
+                    <div class="wheel-card-body">
+                        <div class="measure-row">
+                            <span>ANTES</span>
+                            <input type="text" value="1/2° -">
+                        </div>
+                        <div class="measure-row">
+                            <span>DESPUÉS</span>
+                            <input type="text" value="1/2° -">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Caster Front Left -->
+                <div class="wheel-card">
+                    <div class="wheel-card-header">CASTER DELANTERO IZQ (F-L)</div>
+                    <div class="wheel-card-body">
+                        <div class="measure-row">
+                            <span>ANTES</span>
+                            <input type="text" value="3 1/2° +">
+                        </div>
+                        <div class="measure-row">
+                            <span>DESPUÉS</span>
+                            <input type="text" value="3 1/2° +">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Camber Rear Left -->
+                <div class="wheel-card">
+                    <div class="wheel-card-header">CAMBER TRASERO IZQ (R-L)</div>
+                    <div class="wheel-card-body">
+                        <div class="measure-row">
+                            <span>ANTES</span>
+                            <input type="text" value="2 1/2° -">
+                        </div>
+                        <div class="measure-row">
+                            <span>DESPUÉS</span>
+                            <input type="text" value="3/4° -">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Caster Rear Left -->
+                <div class="wheel-card">
+                    <div class="wheel-card-header">CASTER TRASERO IZQ (R-L)</div>
+                    <div class="wheel-card-body">
+                        <div class="measure-row">
+                            <span>ANTES</span>
+                            <input type="text" value="N/A">
+                        </div>
+                        <div class="measure-row">
+                            <span>DESPUÉS</span>
+                            <input type="text" value="N/A">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center Column (Top/Bottom Convergencia + Car Vector) -->
+            <div class="center-column">
+                <!-- Top Convergencia Status -->
+                <div class="status-box">
+                    <div class="status-box-header">CONVERGENCIA / ALINEACIÓN DELANTERA</div>
+                    <div class="status-box-body">
+                        <div>
+                            <label>ANTES</label>
+                            <input type="text" value='1/16"'>
+                        </div>
+                        <div>
+                            <label>DESPUÉS</label>
+                            <input type="text" value='0"'>
+                        </div>
+                    </div>
+                    <select class="status-badge-select badge-green" onchange="updateBadgeStyle(this)">
+                        <option class="badge-green" value="EN MEDIDA / CONVERGENTE" selected>EN MEDIDA / CONVERGENTE</option>
+                        <option class="badge-red" value="FUERA DE MEDIDA">FUERA DE MEDIDA</option>
+                    </select>
+                </div>
+
+                <!-- SVG Car Top View Diagram -->
+                <svg class="car-vector" viewBox="0 0 200 360" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Body contour -->
+                    <path d="M 50,40 C 50,20 150,20 150,40 L 160,90 C 165,130 165,230 160,280 L 150,330 C 150,345 50,345 50,330 L 40,280 C 35,230 35,130 40,90 Z" 
+                          fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
+                    <!-- Windshield Front -->
+                    <path d="M 55,95 C 70,85 130,85 145,95 L 140,130 C 130,125 70,125 60,130 Z" fill="#cbd5e1" stroke="#475569" stroke-width="2"/>
+                    <!-- Windshield Rear -->
+                    <path d="M 60,250 C 70,255 130,255 140,250 L 145,275 C 130,280 70,280 55,275 Z" fill="#cbd5e1" stroke="#475569" stroke-width="2"/>
+                    <!-- Roof lines -->
+                    <line x1="58" y1="135" x2="55" y2="245" stroke="#94a3b8" stroke-width="2"/>
+                    <line x1="142" y1="135" x2="145" y2="245" stroke="#94a3b8" stroke-width="2"/>
+                    <!-- Wheels (Front Left, Front Right, Rear Left, Rear Right) -->
+                    <rect x="22" y="60" width="16" height="42" rx="4" fill="#1e293b"/>
+                    <rect x="162" y="60" width="16" height="42" rx="4" fill="#1e293b"/>
+                    <rect x="22" y="250" width="16" height="42" rx="4" fill="#1e293b"/>
+                    <rect x="162" y="250" width="16" height="42" rx="4" fill="#1e293b"/>
+                    <!-- Axles -->
+                    <line x1="38" y1="81" x2="162" y2="81" stroke="#64748b" stroke-width="2" stroke-dasharray="4"/>
+                    <line x1="38" y1="271" x2="162" y2="271" stroke="#64748b" stroke-width="2" stroke-dasharray="4"/>
+                </svg>
+
+                <!-- Bottom Convergencia Total Status -->
+                <div class="status-box">
+                    <div class="status-box-header">CONVERGENCIA TOTAL</div>
+                    <div class="status-box-body">
+                        <div>
+                            <label>ANTES</label>
+                            <input type="text" value="FUERA DE MEDIDA">
+                        </div>
+                        <div>
+                            <label>DESPUÉS</label>
+                            <input type="text" value='0"'>
+                        </div>
+                    </div>
+                    <select class="status-badge-select badge-green" onchange="updateBadgeStyle(this)">
+                        <option class="badge-green" value="EN MEDIDA" selected>EN MEDIDA</option>
+                        <option class="badge-red" value="FUERA DE MEDIDA">FUERA DE MEDIDA</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Right Side Controls (Front Right & Rear Right) -->
+            <div>
+                <!-- Camber Front Right -->
+                <div class="wheel-card">
+                    <div class="wheel-card-header">CAMBER DELANTERO DER (F-R)</div>
+                    <div class="wheel-card-body">
+                        <div class="measure-row">
+                            <span>ANTES</span>
+                            <input type="text" value="1/2° -">
+                        </div>
+                        <div class="measure-row">
+                            <span>DESPUÉS</span>
+                            <input type="text" value="1/2° -">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Caster Front Right -->
+                <div class="wheel-card">
+                    <div class="wheel-card-header">CASTER DELANTERO DER (F-R)</div>
+                    <div class="wheel-card-body">
+                        <div class="measure-row">
+                            <span>ANTES</span>
+                            <input type="text" value="3 1/2° +">
+                        </div>
+                        <div class="measure-row">
+                            <span>DESPUÉS</span>
+                            <input type="text" value="3 1/2° +">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Camber Rear Right -->
+                <div class="wheel-card">
+                    <div class="wheel-card-header">CAMBER TRASERO DER (R-R)</div>
+                    <div class="wheel-card-body">
+                        <div class="measure-row">
+                            <span>ANTES</span>
+                            <input type="text" value="1 1/2° -">
+                        </div>
+                        <div class="measure-row">
+                            <span>DESPUÉS</span>
+                            <input type="text" value="3/4° -">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Caster Rear Right -->
+                <div class="wheel-card">
+                    <div class="wheel-card-header">CASTER TRASERO DER (R-R)</div>
+                    <div class="wheel-card-body">
+                        <div class="measure-row">
+                            <span>ANTES</span>
+                            <input type="text" value="N/A">
+                        </div>
+                        <div class="measure-row">
+                            <span>DESPUÉS</span>
+                            <input type="text" value="N/A">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observaciones Textarea -->
+        <div class="notes-section">
+            <label>Observaciones:</label>
+            <textarea id="observaciones">SE REALIZA CUADRATURA DE TREN TRASERO AMBOS LADOS, QUEDANDO EN MEDIDAS ESPECIFICADAS POR FABRICANTE. POSTERIORMENTE SE PROCEDE A REALIZAR ALINEACION QUEDANDO EN MEDIDAS EXIGIDAS POR NORMA CHILENA (PRT)</textarea>
+        </div>
+
+        <!-- Garantía Footer -->
+        <div class="warranty-banner">
+            GARANTÍA ALINEACIÓN: TODA ALINEACIÓN (CONVERGENCIA) TIENE UNA GARANTÍA DE 5 DÍAS CORRIDOS
+        </div>
+    </div>
+
+    <script>
+        // Auto set today's date formatted in Spanish
+        function setTodayDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date().toLocaleDateString('es-CL', options);
+            document.getElementById('fecha').value = today.charAt(0).toUpperCase() + today.slice(1);
+        }
+        //funcion buscar pateente consumiendo apichile
+        async function buscarPorPatente() {
+            const patenteInput = document.getElementById('patente');
+            const patente = patenteInput.value.trim().toUpperCase();
+
+            if (patente.length < 6) return;
+
+             // Mostrar estado de carga (opcional)
+            patenteInput.style.backgroundColor = '#fffbe2';
+
+            try {
+                const response = await fetch(`https://api.libreapi.cl/vehicles/get?plate=${patente}`);
+                if (!response.ok) throw new Error('Patente no encontrada');
+
+                const data = await response.json();
+                
+                if (data && data.data) {
+                    const vehiculo = data.data;
+
+                    // Rellenar campos del formulario automáticamente
+                    if (vehiculo.brand) document.getElementById('marca').value = vehiculo.brand;
+                    if (vehiculo.model) document.getElementById('modelo').value = vehiculo.model;
+                    if (vehiculo.year) document.getElementById('ano').value = vehiculo.year;
+                    if (vehiculo.vin) document.getElementById('chasis').value = vehiculo.vin;
+                    
+                    // Si la API devuelve el nombre o RUT del propietario
+                    if (vehiculo.owner) document.getElementById('nombre').value = vehiculo.owner;
+                    if (vehiculo.rut) document.getElementById('rut').value = vehiculo.rut;
+                }
+            } catch (error) {
+                console.warn('No se pudieron obtener los datos automáticos:', error);
+            } finally {
+                patenteInput.style.backgroundColor = 'white';
+            }
+        }
+
+        // Escuchar el evento cuando el usuario termina de escribir o cambia de campo
+        document.getElementById('patente').addEventListener('blur', buscarPorPatente);
+
+            //conexion a supabase de datoss
+            //conexion a supabase de datoss
+            //conexion a supabase de datoss
+
+
+        // Inicializar cliente Supabase (Reemplaza con tu URL y ANON Key del Dashboard)
+        const SUPABASE_URL = 'https://jeeisjfjancurakbfskv.supabase.co/rest/v1/';
+        const SUPABASE_KEY = 'sb_publishable_PsYCbH1oj6lu-SQBl3ZYTg_g7VlRy4j';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // 🔍 1. CONSULTAR PATENTE AL CAMBIAR O PERDER EL FOCO DEL INPUT
+        async function buscarPorPatente() {
+            const patenteInput = document.getElementById('patente');
+            const patenteVal = patenteInput.value.trim().toUpperCase();
+
+            if (!patenteVal) return;
+
+            patenteInput.style.backgroundColor = '#e0f2fe';
+
+            try {
+                // Trae el último registro guardado de esta patente
+                const { data, error } = await _supabase
+                    .from('informes_alineacion')
+                    .select('*')
+                    .eq('patente', patenteVal)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+
+                if (error) console.error('Error al consultar Supabase:', error);
+
+                if (data) {
+                    // Autocompletar datos del cliente y del vehículo
+                    document.getElementById('rut').value = data.rut || '';
+                    document.getElementById('nombre').value = data.nombre || '';
+                    document.getElementById('marca').value = data.marca || '';
+                    document.getElementById('modelo').value = data.modelo || '';
+                    document.getElementById('ano').value = data.ano || '';
+                    document.getElementById('chasis').value = data.chasis || '';
+                    console.log('Vehículo encontrado en el historial de Supabase');
+                } else {
+                    console.log('Patente nueva. Ingrese datos normalmente.');
+                }
+            } catch (err) {
+                console.error('Error de conexión:', err);
+            } finally {
+                patenteInput.style.backgroundColor = 'white';
+            }
+        }
+
+        // Escuchar evento blur en el campo de la patente
+        document.getElementById('patente').addEventListener('blur', buscarPorPatente);
+
+
+        // 💾 2. GUARDAR INFORME COMPLETO EN SUPABASE
+        async function guardarInforme() {
+            const patente = document.getElementById('patente').value.trim().toUpperCase();
+
+            if (!patente) {
+                alert('Por favor ingrese una patente');
+                return;
+            }
+
+            const payload = {
+                folio: document.getElementById('folio').value,
+                patente: patente,
+                rut: document.getElementById('rut').value,
+                nombre: document.getElementById('nombre').value,
+                marca: document.getElementById('marca').value,
+                modelo: document.getElementById('modelo').value,
+                ano: document.getElementById('ano').value,
+                chasis: document.getElementById('chasis').value,
+                documento: document.getElementById('documento').value,
+                fecha_texto: document.getElementById('fecha').value,
+                
+                // Mediciones de Alineación
+                camber_fl_antes: document.getElementById('camber_fl_antes').value,
+                camber_fl_despues: document.getElementById('camber_fl_despues').value,
+                camber_fr_antes: document.getElementById('camber_fr_antes').value,
+                camber_fr_despues: document.getElementById('camber_fr_despues').value,
+                
+                conv_del_antes: document.getElementById('conv_del_antes').value,
+                conv_del_despues: document.getElementById('conv_del_despues').value,
+                conv_del_estado: document.getElementById('conv_del_estado').value,
+                
+                observaciones: document.getElementById('observaciones').value
+            };
+
+            const { data, error } = await _supabase
+                .from('informes_alineacion')
+                .insert([payload]);
+
+            if (error) {
+                alert('❌ Error al guardar en Supabase: ' + error.message);
+            } else {
+                alert('🎉 ¡Informe guardado exitosamente en la base de datos!');
+            }
+        }
+
+
+
+
+        // Change select element color based on selection
+        function updateBadgeStyle(selectElem) {
+            if (selectElem.value.includes('FUERA')) {
+                selectElem.className = 'status-badge-select badge-red';
+            } else {
+                selectElem.className = 'status-badge-select badge-green';
+            }
+        }
+
+        function clearForm() {
+            if (confirm('¿Desea limpiar todos los campos del formulario?')) {
+                const inputs = document.querySelectorAll('input, textarea');
+                inputs.forEach(input => {
+                    if (input.id !== 'folio') {
+                        input.value = '';
+                    }
+                });
+                setTodayDate();
+            }
+        }
+
+        function fillExampleData() {
+            setTodayDate();
+            document.getElementById('rut').value = '15.420.198-7';
+            document.getElementById('patente').value = 'HJGS60';
+            document.getElementById('nombre').value = 'MECANICA BUSTAMANTE';
+            document.getElementById('marca').value = 'FORD';
+            document.getElementById('modelo').value = 'EXPLORER 2.3 ECOBOOST GRIS';
+            document.getElementById('ano').value = '2015';
+            document.getElementById('chasis').value = '1FM5K8F85FGC31151';
+            document.getElementById('documento').value = 'S/N';
+            document.getElementById('observaciones').value = 'SE REALIZA CUADRATURA DE TREN TRASERO AMBOS LADOS, QUEDANDO EN MEDIDAS ESPECIFICADAS POR FABRICANTE. POSTERIORMENTE SE PROCEDE A REALIZAR ALINEACION QUEDANDO EN MEDIDAS EXIGIDAS POR NORMA CHILENA (PRT)';
+        }
+
+        // Initialize date on load
+        window.onload = function() {
+            setTodayDate();
+        };
+    </script>
+</body>
+</html>
