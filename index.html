@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Informe Técnico de Alineación y Geometría</title>
+  <title>Informe Técnico de Geometría y Alineación</title>
   <style>
     :root {
       --bg-color: #f1f5f9;
       --card-bg: #ffffff;
-      --text-color: #1e293b;
+      --text-color: #0f172a;
       --border-color: #cbd5e1;
       --primary: #0f172a;
+      --primary-accent: #2563eb;
       --green: #22c55e;
       --yellow: #eab308;
       --red: #ef4444;
@@ -19,23 +20,31 @@
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
     body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
 
-    .container { max-width: 960px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .container { max-width: 1050px; margin: 0 auto; background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
-    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 15px; margin-bottom: 20px; }
-    .header h1 { margin: 0; font-size: 22px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
-    .header .subtitle { font-size: 13px; color: #64748b; margin-top: 4px; }
+    /* Encabezado de Empresa y Folio */
+    .company-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 15px; margin-bottom: 20px; }
+    .brand-section { display: flex; align-items: center; gap: 15px; }
+    .logo-placeholder { width: 130px; height: 50px; border: 2px dashed #94a3b8; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #64748b; background: #f8fafc; }
+    .company-info h2 { margin: 0; font-size: 18px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+    .company-info p { margin: 2px 0 0 0; font-size: 11px; color: #64748b; }
+    .doc-meta { text-align: right; }
+    .folio-box { background: #f8fafc; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; display: inline-block; text-align: center; }
+    .folio-box .label { font-size: 10px; font-weight: bold; color: #64748b; text-transform: uppercase; }
+    .folio-box .number { font-size: 16px; font-weight: bold; color: var(--red); display: block; }
 
+    /* Controles de Datos */
     .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
     label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #475569; text-transform: uppercase; }
     input[type="text"], input[type="date"], select, textarea {
-      width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; background: #fff;
+      width: 100%; padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 12px; background: #fff;
     }
 
-    /* Esquema Visual del Auto */
+    /* Diagrama interactivo */
     .diagram-container {
       position: relative;
       width: 100%;
-      height: 520px;
+      height: 580px;
       background: #f8fafc;
       border: 1px solid var(--border-color);
       border-radius: 10px;
@@ -46,16 +55,12 @@
       overflow: hidden;
     }
 
-    /* SVG del Vehículo */
-    .car-svg {
-      height: 440px;
-      opacity: 0.85;
-    }
+    .car-svg { height: 480px; opacity: 0.85; }
 
-    /* Tarjetas de Medición posicionadas sobre el diagrama */
+    /* Tarjetas de Medición */
     .wheel-card {
       position: absolute;
-      width: 210px;
+      width: 270px;
       background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -75,42 +80,53 @@
       align-items: center;
     }
 
+    .measure-header {
+      display: grid;
+      grid-template-columns: 75px 1fr 1fr;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: bold;
+      color: #64748b;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
     .measure-row {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: 75px 1fr 1fr;
+      gap: 4px;
       align-items: center;
-      margin-bottom: 6px;
-      font-size: 12px;
+      margin-bottom: 5px;
+      font-size: 11px;
     }
 
     .measure-row input {
-      width: 65px;
       padding: 4px;
       text-align: center;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: bold;
     }
 
-    /* Posicionamiento de las ruedas */
-    .pos-front-left  { top: 20px; left: 20px; }
-    .pos-front-right { top: 20px; right: 20px; }
-    .pos-rear-left   { bottom: 20px; left: 20px; }
-    .pos-rear-right  { bottom: 20px; right: 20px; }
+    /* Posicionamiento sobre la imagen */
+    .pos-front-left  { top: 15px; left: 15px; }
+    .pos-front-right { top: 15px; right: 15px; }
+    .pos-rear-left   { bottom: 15px; left: 15px; }
+    .pos-rear-right  { bottom: 15px; right: 15px; }
 
-    /* Semáforo visual */
+    /* Semáforo */
     .traffic-light { display: flex; gap: 4px; }
     .status-btn {
-      width: 16px; height: 16px; border-radius: 50%; border: 1px solid #cbd5e1; cursor: pointer; opacity: 0.25; transition: all 0.2s;
+      width: 15px; height: 15px; border-radius: 50%; border: 1px solid #cbd5e1; cursor: pointer; opacity: 0.25; transition: all 0.2s;
     }
     .status-btn.green { background-color: var(--green); border-color: var(--green); }
     .status-btn.yellow { background-color: var(--yellow); border-color: var(--yellow); }
     .status-btn.red { background-color: var(--red); border-color: var(--red); }
     .status-btn.active { opacity: 1; transform: scale(1.2); }
 
-    /* Línea indicadora de Chasis / Geometría Central */
+    /* Centro - Geometría */
     .center-card {
       position: absolute;
-      bottom: 20px;
+      bottom: 15px;
       background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -118,21 +134,29 @@
       font-size: 11px;
       text-align: center;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
 
-    /* Botones de Acción */
-    .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
+    /* Pie de Página e Impresión */
+    .footer-section { margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px; }
+    .signatures-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; }
+    .signature-line { border-top: 1px dashed #94a3b8; text-align: center; padding-top: 6px; font-size: 11px; color: #475569; font-weight: bold; }
+    .disclaimer { font-size: 10px; color: #94a3b8; text-align: center; margin-top: 20px; line-height: 1.4; }
+
+    .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
     .btn { padding: 10px 18px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
     .btn-primary { background: var(--primary); color: white; }
     .btn-secondary { background: #e2e8f0; color: #334155; }
 
-    /* Estilos de Impresión / PDF */
     @media print {
       body { background: white; padding: 0; }
       .container { box-shadow: none; padding: 0; width: 100%; max-width: 100%; }
       .actions, .status-btn:not(.active) { display: none !important; }
       .status-btn.active { opacity: 1; transform: scale(1); border: none; }
       .diagram-container { border: none; background: transparent; }
+      .logo-placeholder { border: 1px solid #cbd5e1; }
       input, select, textarea { border: none !important; background: transparent !important; appearance: none; padding: 0; }
     }
   </style>
@@ -140,57 +164,62 @@
 <body>
 
 <div class="container">
-  <!-- Encabezado -->
-  <div class="header">
-    <div>
-      <h1>Informe Visual de Geometría y Alineación</h1>
-      <div class="subtitle">Diagnóstico Estructural y Deformación de Trenes</div>
+  
+  <!-- ENCABEZADO DE LA EMPRESA Y FOLIO -->
+  <div class="company-header">
+    <div class="brand-section">
+      <!-- Reemplazar este div con <img src="logo.png" style="height: 50px;"> -->
+      <div class="logo-placeholder">LOGO EMPRESA</div>
+      <div class="company-info">
+        <h2>Centro Integral de Alineación & Taller</h2>
+        <p>Dirección Taller #1234, Ciudad | Tel: +56 9 1234 5678</p>
+        <p>Email: contacto@taller.cl | www.taller.cl</p>
+      </div>
     </div>
-    <div style="text-align: right;">
-      <label>Fecha</label>
-      <input type="date" id="fecha">
+    <div class="doc-meta">
+      <div class="folio-box">
+        <span class="label">Informe N°</span>
+        <span class="number" id="folio-num">FOL-00842</span>
+      </div>
+      <div style="margin-top: 5px;">
+        <label>Fecha</label>
+        <input type="date" id="fecha" style="font-size: 11px; padding: 2px 4px;">
+      </div>
     </div>
   </div>
 
-  <!-- Datos del Vehículo -->
+  <!-- DATOS DEL CLIENTE Y VEHÍCULO -->
   <div class="grid-4">
     <div>
+      <label>Cliente / Nombre</label>
+      <input type="text" placeholder="Nombre completo" id="cliente">
+    </div>
+    <div>
       <label>Patente</label>
-      <input type="text" placeholder="ABCD-12" id="patente">
+      <input type="text" placeholder="ABCD-12" id="patente" style="text-transform: uppercase;">
     </div>
     <div>
-      <label>Vehículo</label>
-      <input type="text" placeholder="Marca / Modelo" id="modelo">
+      <label>Vehículo / Modelo</label>
+      <input type="text" placeholder="Ej: Audi A3 / Toyota RAV4" id="modelo">
     </div>
     <div>
-      <label>Kilometraje</label>
-      <input type="text" placeholder="Ej: 85,000 km" id="km">
-    </div>
-    <div>
-      <label>Técnico</label>
-      <input type="text" placeholder="Operador" id="tecnico">
+      <label>Técnico Operador</label>
+      <input type="text" placeholder="Nombre especialista" id="tecnico">
     </div>
   </div>
 
-  <!-- DIAGRAMA VISUAL DEL AUTO CON MEDIDAS -->
+  <!-- DIAGRAMA VISUAL DEL VEHÍCULO -->
   <div class="diagram-container">
     
-    <!-- Vector del Auto (Vista Superior) -->
-    <svg class="car-svg" viewBox="0 0 200 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Cuerpo del Auto -->
+    <svg class="car-svg" viewBox="0 0 200 400" fill="none">
       <rect x="35" y="30" width="130" height="340" rx="40" fill="#e2e8f0" stroke="#94a3b8" stroke-width="3"/>
-      <!-- Parabrisas Delantero -->
       <path d="M 50 110 Q 100 95 150 110 L 142 140 Q 100 135 58 140 Z" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>
-      <!-- Parabrisas Trasero -->
       <path d="M 55 290 Q 100 300 145 290 L 140 315 Q 100 320 60 315 Z" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>
-      <!-- Techo -->
       <rect x="52" y="145" width="96" height="135" rx="10" fill="#cbd5e1" opacity="0.5"/>
-      <!-- Ruedas -->
-      <rect x="18" y="55" width="22" height="50" rx="6" fill="#1e293b"/> <!-- Del. Izq -->
-      <rect x="160" y="55" width="22" height="50" rx="6" fill="#1e293b"/> <!-- Del. Der -->
-      <rect x="18" y="295" width="22" height="50" rx="6" fill="#1e293b"/> <!-- Tras. Izq -->
-      <rect x="160" y="295" width="22" height="50" rx="6" fill="#1e293b"/> <!-- Tras. Der -->
-      <!-- Ejes -->
+      <rect x="18" y="55" width="22" height="50" rx="6" fill="#1e293b"/>
+      <rect x="160" y="55" width="22" height="50" rx="6" fill="#1e293b"/>
+      <rect x="18" y="295" width="22" height="50" rx="6" fill="#1e293b"/>
+      <rect x="160" y="295" width="22" height="50" rx="6" fill="#1e293b"/>
       <line x1="40" y1="80" x2="160" y2="80" stroke="#64748b" stroke-width="2" stroke-dasharray="4"/>
       <line x1="40" y1="320" x2="160" y2="320" stroke="#64748b" stroke-width="2" stroke-dasharray="4"/>
       <line x1="100" y1="80" x2="100" y2="320" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6"/>
@@ -205,17 +234,23 @@
           <div class="status-btn red" onclick="setStatus(this)"></div>
         </div>
       </h3>
-      <div class="measure-row">
-        <span>Convergencia:</span>
-        <input type="text" placeholder="+0°05'">
+      <div class="measure-header">
+        <span>Parámetro</span><span>Antes</span><span>Después</span>
       </div>
       <div class="measure-row">
-        <span>Cámber:</span>
-        <input type="text" placeholder="-0°45'">
+        <span>Converg.</span>
+        <input type="text" class="auto-format" placeholder="-0 15">
+        <input type="text" class="auto-format" placeholder="+0 05">
       </div>
       <div class="measure-row">
-        <span>Cáster:</span>
-        <input type="text" placeholder="+3°10'">
+        <span>Cámber</span>
+        <input type="text" class="auto-format" placeholder="-1 20">
+        <input type="text" class="auto-format" placeholder="-0 45">
+      </div>
+      <div class="measure-row">
+        <span>Cáster</span>
+        <input type="text" class="auto-format" placeholder="+2 50">
+        <input type="text" class="auto-format" placeholder="+3 10">
       </div>
     </div>
 
@@ -228,17 +263,23 @@
           <div class="status-btn red" onclick="setStatus(this)"></div>
         </div>
       </h3>
-      <div class="measure-row">
-        <span>Convergencia:</span>
-        <input type="text" placeholder="+0°05'">
+      <div class="measure-header">
+        <span>Parámetro</span><span>Antes</span><span>Después</span>
       </div>
       <div class="measure-row">
-        <span>Cámber:</span>
-        <input type="text" placeholder="-0°45'">
+        <span>Converg.</span>
+        <input type="text" class="auto-format" placeholder="-0 10">
+        <input type="text" class="auto-format" placeholder="+0 05">
       </div>
       <div class="measure-row">
-        <span>Cáster:</span>
-        <input type="text" placeholder="+3°15'">
+        <span>Cámber</span>
+        <input type="text" class="auto-format" placeholder="-0 40">
+        <input type="text" class="auto-format" placeholder="-0 45">
+      </div>
+      <div class="measure-row">
+        <span>Cáster</span>
+        <input type="text" class="auto-format" placeholder="+3 00">
+        <input type="text" class="auto-format" placeholder="+3 15">
       </div>
     </div>
 
@@ -251,13 +292,18 @@
           <div class="status-btn red" onclick="setStatus(this)"></div>
         </div>
       </h3>
-      <div class="measure-row">
-        <span>Convergencia:</span>
-        <input type="text" placeholder="+0°02'">
+      <div class="measure-header">
+        <span>Parámetro</span><span>Antes</span><span>Después</span>
       </div>
       <div class="measure-row">
-        <span>Cámber:</span>
-        <input type="text" placeholder="-1°00'">
+        <span>Converg.</span>
+        <input type="text" class="auto-format" placeholder="+0 08">
+        <input type="text" class="auto-format" placeholder="+0 02">
+      </div>
+      <div class="measure-row">
+        <span>Cámber</span>
+        <input type="text" class="auto-format" placeholder="-1 15">
+        <input type="text" class="auto-format" placeholder="-1 00">
       </div>
     </div>
 
@@ -270,45 +316,70 @@
           <div class="status-btn red" onclick="setStatus(this)"></div>
         </div>
       </h3>
-      <div class="measure-row">
-        <span>Convergencia:</span>
-        <input type="text" placeholder="+0°02'">
+      <div class="measure-header">
+        <span>Parámetro</span><span>Antes</span><span>Después</span>
       </div>
       <div class="measure-row">
-        <span>Cámber:</span>
-        <input type="text" placeholder="-1°00'">
+        <span>Converg.</span>
+        <input type="text" class="auto-format" placeholder="+0 05">
+        <input type="text" class="auto-format" placeholder="+0 02">
+      </div>
+      <div class="measure-row">
+        <span>Cámber</span>
+        <input type="text" class="auto-format" placeholder="-1 05">
+        <input type="text" class="auto-format" placeholder="-1 00">
       </div>
     </div>
 
-    <!-- CONTROL CENTRAL DE GEOMETRÍA DE CHASIS -->
+    <!-- CENTRO - ÁNGULO DE EMPUJE -->
     <div class="center-card">
-      <strong>Ángulo de Empuje / Cuadratura:</strong>
-      <input type="text" placeholder="0°00'" style="width: 70px; text-align: center; font-weight: bold; margin-left: 5px;">
+      <strong>Ángulo Empuje:</strong>
+      <span>Antes:</span>
+      <input type="text" class="auto-format" placeholder="0 05" style="width: 50px; text-align: center;">
+      <span>Después:</span>
+      <input type="text" class="auto-format" placeholder="0 00" style="width: 50px; text-align: center;">
     </div>
 
   </div>
 
-  <!-- Resumen para el Cliente -->
+  <!-- OBSERVACIONES Y ESTADO -->
   <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
     <div>
-      <label>Diagnóstico General</label>
+      <label>Resultado Global</label>
       <select id="estado-general">
-        <option value="ok">🟢 Geometría y Alineación Correctas</option>
-        <option value="warning">🟡 Alineado con Desgaste / Observaciones</option>
-        <option value="danger">🔴 Desalineación Severa / Daño Estructural</option>
+        <option value="ok">🟢 Geometría en Tolerancia Óptima</option>
+        <option value="warning">🟡 Alineado con Desgaste / Revisar Bujes</option>
+        <option value="danger">🔴 Desviación Severa / Requiere Reparación</option>
       </select>
     </div>
     <div>
       <label>Observaciones del Técnico</label>
-      <textarea rows="2" placeholder="Ej: Se observa ligera deformación en el eje delantero derecho. Se ajustó convergencia al rango óptimo."></textarea>
+      <textarea rows="2" placeholder="Ej: Se corrigió la convergencia del eje delantero. Se sugiere rotación de neumáticos en 5,000 km."></textarea>
     </div>
   </div>
 
-  <!-- Acciones -->
+  <!-- PIE DE PÁGINA (FIRMAS Y DISCLAIMER) -->
+  <div class="footer-section">
+    <div class="signatures-grid">
+      <div class="signature-line">
+        Firma / Timbre del Técnico
+      </div>
+      <div class="signature-line">
+        Conforme Cliente / Recepción
+      </div>
+    </div>
+    <div class="disclaimer">
+      Este informe certifica las mediciones de geometría tomadas bajo los parámetros del fabricante al momento del servicio.<br>
+      Garantía de alineación válida por 30 días o 1,000 km previa inspección del estado de los neumáticos y componentes de suspensión.
+    </div>
+  </div>
+
+  <!-- BOTONES DE ACCIÓN -->
   <div class="actions">
     <button class="btn btn-secondary" onclick="limpiar()">Limpiar Formulario</button>
     <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
   </div>
+
 </div>
 
 <script>
@@ -325,8 +396,45 @@
     }
   }
 
+  // AUTOMATIZACIÓN DE FORMATEO (° ' " /)
+  document.querySelectorAll('.auto-format').forEach(input => {
+    input.addEventListener('blur', function() {
+      let val = this.value.trim();
+      if (!val) return;
+
+      if (val.includes('/')) {
+        let parts = val.split('/');
+        this.value = parts.map(p => formatValue(p.trim())).join(' / ');
+      } else {
+        this.value = formatValue(val);
+      }
+    });
+  });
+
+  function formatValue(val) {
+    if (!val) return '';
+    
+    // Si escribe números separados por espacio ("0 15" -> "0°15'")
+    if (/^[+-]?\d+\s+\d+$/.test(val)) {
+      let parts = val.split(/\s+/);
+      return `${parts[0]}°${parts[1]}'`;
+    }
+    
+    // Si escribe número entero ("15" -> "15°")
+    if (/^[+-]?\d+$/.test(val) && !val.includes('°') && !val.includes('"')) {
+      return `${val}°`;
+    }
+
+    // Si indica pulgadas ("1/4 in" -> "1/4"")
+    if (val.endsWith('in') || val.endsWith('pulg')) {
+      return val.replace(/(in|pulg)/g, '').trim() + '"';
+    }
+
+    return val;
+  }
+
   function limpiar() {
-    if (confirm('¿Limpiar los datos del informe?')) {
+    if (confirm('¿Desea limpiar los campos del informe?')) {
       document.querySelectorAll('input[type="text"], textarea').forEach(i => i.value = '');
       document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
     }
