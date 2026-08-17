@@ -3,209 +3,253 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alineaciones Bustamante - Sistema de Informes</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- QRCode.js CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
+  <title>Informe Técnico de Alineación</title>
   <style>
+    :root {
+      --bg-color: #f4f6f9;
+      --card-bg: #ffffff;
+      --text-color: #333333;
+      --border-color: #dde2e5;
+      --primary: #1e293b;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+    }
+
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
+
+    .container { max-width: 900px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 15px; margin-bottom: 20px; }
+    .header h1 { margin: 0; font-size: 24px; color: var(--primary); text-transform: uppercase; }
+    .header .subtitle { font-size: 14px; color: #64748b; margin-top: 4px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+
+    label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #475569; text-transform: uppercase; }
+    input[type="text"], input[type="date"], select, textarea {
+      width: 100%; padding: 8px 12px; border: 1fr solid var(--border-color); border-radius: 6px; font-size: 14px; background: #fff;
+    }
+
+    section { margin-bottom: 25px; }
+    section h2 { font-size: 16px; border-left: 4px solid var(--primary); padding-left: 8px; margin-bottom: 12px; color: var(--primary); }
+
+    /* Tabla de mediciones */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+    th, td { border: 1px solid var(--border-color); padding: 10px; text-align: center; font-size: 14px; }
+    th { background-color: #f8fafc; color: #334155; font-weight: 600; }
+
+    /* Semáforo interactivo */
+    .traffic-light { display: flex; justify-content: center; gap: 8px; }
+    .status-btn {
+      width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1; cursor: pointer; opacity: 0.3; transition: all 0.2s;
+    }
+    .status-btn.green { background-color: var(--green); border-color: var(--green); }
+    .status-btn.yellow { background-color: var(--yellow); border-color: var(--yellow); }
+    .status-btn.red { background-color: var(--red); border-color: var(--red); }
+    .status-btn.active { opacity: 1; transform: scale(1.25); box-shadow: 0 0 8px rgba(0,0,0,0.2); }
+
+    /* Checklist */
+    .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8fafc; padding: 15px; border-radius: 8px; }
+    .check-item { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+    .check-item input { width: 18px; height: 18px; cursor: pointer; }
+
+    /* Botones de acción */
+    .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-secondary { background: #e2e8f0; color: #334155; }
+
+    /* Estilos para impresión / PDF */
     @media print {
-      body {
-        background-color: white !important;
-        padding: 0 !important;
-      }
-      .no-print {
-        display: none !important;
-      }
-      .print-shadow-none {
-        box-shadow: none !important;
-        border: none !important;
-      }
+      body { background: white; padding: 0; }
+      .container { box-shadow: none; padding: 0; width: 100%; max-width: 100%; }
+      .actions, .status-btn:not(.active) { display: none !important; }
+      .status-btn.active { opacity: 1; transform: scale(1); border: none; }
+      input, select, textarea { border: none !important; background: transparent !important; appearance: none; padding: 0; }
     }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen font-sans p-2 sm:p-4 md:p-8">
+<body>
 
-  <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden border border-slate-200 print-shadow-none">
-    
-    <!-- BARRA DE CONFIGURACIÓN DE SUPABASE (NO PRINT) -->
-    <div id="config-bar" class="no-print bg-slate-800 text-white p-4 border-b border-slate-700 text-xs">
-      <div class="flex flex-col md:flex-row justify-between items-center gap-3">
-        <div class="flex items-center space-x-2">
-          <span class="text-amber-400 font-bold text-sm">⚡ Conexión Supabase</span>
-          <span id="connection-status" class="bg-red-500 text-white px-2 py-0.5 rounded text-[10px] font-bold">DESCONECTADO (Modo Demo)</span>
-        </div>
-        <div class="flex flex-wrap gap-2 w-full md:w-auto">
-          <input type="text" id="supabase-url" placeholder="Supabase URL (https://xyz.supabase.co)" class="px-2 py-1 text-slate-900 rounded text-xs flex-1 md:w-56 outline-none">
-          <input type="password" id="supabase-key" placeholder="Anon Key" class="px-2 py-1 text-slate-900 rounded text-xs flex-1 md:w-56 outline-none">
-          <button onclick="conectarSupabase()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded font-bold transition">Conectar</button>
-        </div>
-      </div>
+<div class="container">
+  <!-- Encabezado -->
+  <div class="header">
+    <div>
+      <h1>Informe Técnico de Alineación</h1>
+      <div class="subtitle">Centro Especializado de Geometría Automotriz</div>
     </div>
-
-    <!-- ENCABEZADO PRINCIPAL -->
-    <div class="p-6 bg-white border-b-4 border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4">
-      <div class="flex items-center gap-4">
-        <div class="border-2 border-red-600 p-2 rounded-lg text-center bg-slate-50">
-          <div class="text-3xl">🛞</div>
-        </div>
-        <div>
-          <h1 class="text-2xl font-black text-slate-900 tracking-tight">ALINEACIONES BUSTAMANTE</h1>
-          <p class="text-xs font-semibold text-slate-600">AV. Gral. Bustamante N° 640, Ñuñoa, Santiago</p>
-          <p class="text-xs text-slate-500">Teléfono: +56 2 2904 8965 | Whatsapp: +56 9 8577 9851</p>
-          <p class="text-xs font-bold text-red-600">www.alineaciones.cl</p>
-        </div>
-      </div>
-
-      <!-- RECUADRO DE FOLIO -->
-      <div class="border-2 border-red-600 rounded-lg p-3 text-center bg-red-50 min-w-[150px]">
-        <span class="text-xs font-black text-red-600 block uppercase tracking-wider">FOLIO N°</span>
-        <span id="display-folio" class="text-2xl font-black text-red-700 font-mono">13.456</span>
-      </div>
+    <div style="text-align: right;">
+      <label>Fecha</label>
+      <input type="date" id="fecha">
     </div>
-
-    <!-- NOTIFICACIONES TEMPORALES -->
-    <div id="toast-msg" class="hidden no-print p-3 text-xs font-bold text-center"></div>
-
-    <!-- FORMULARIO DEL INFORME -->
-    <form id="informe-form" onsubmit="guardarInforme(event)" class="p-6 space-y-6">
-
-      <div class="bg-slate-900 text-white text-center py-2 font-black uppercase text-sm tracking-widest rounded">
-        INFORME DE ALINEACION
-      </div>
-
-      <!-- DATOS DEL VEHÍCULO -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
-        <div class="md:col-span-1">
-          <label class="block text-[11px] font-black text-slate-700 uppercase mb-1">PATENTE *</label>
-          <input type="text" id="patente" required placeholder="HJGS60"
-            class="w-full text-center font-mono font-black text-lg p-1.5 border-2 border-red-500 rounded focus:bg-yellow-50 outline-none uppercase"
-            onblur="buscarVehiculoPorPatente(this.value)">
-          <span class="text-[9px] text-slate-500 block text-center no-print mt-0.5">🔍 Presiona Tab para buscar</span>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">FECHA</label>
-          <input type="text" id="fecha-str" class="w-full p-1.5 border rounded text-xs text-center font-bold" readonly>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">RUT CLIENTE</label>
-          <input type="text" id="rut" placeholder="12.345.678-9" class="w-full p-1.5 border rounded text-xs font-semibold">
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">NOMBRE / RAZON S.</label>
-          <input type="text" id="nombre_propietario" placeholder="Juan Pérez" class="w-full p-1.5 border rounded text-xs uppercase">
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">MARCA</label>
-          <input type="text" id="marca" placeholder="FORD" class="w-full p-1.5 border rounded text-xs font-bold uppercase">
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">MODELO</label>
-          <input type="text" id="modelo" placeholder="EXPLORER 2.3 ECOBOOST" class="w-full p-1.5 border rounded text-xs font-bold uppercase">
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">AÑO</label>
-          <input type="number" id="anio" placeholder="2015" class="w-full p-1.5 border rounded text-xs font-bold">
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">N° CHASIS (VIN)</label>
-          <input type="text" id="numero_chasis" placeholder="1FMSK8FH8FGC31161" class="w-full p-1.5 border rounded text-xs font-mono uppercase">
-        </div>
-      </div>
-
-      <!-- CÓDIGO QR Y VERIFICACIÓN EN VIVO -->
-      <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
-        <div class="flex items-center gap-3">
-          <div id="qrcode" class="bg-white p-1.5 border border-slate-300 rounded"></div>
-          <div class="text-left">
-            <span class="text-xs font-bold text-slate-800 block">🔒 Documento Verificable en Internet</span>
-            <span class="text-[10px] text-slate-500 block">Escanee el código QR para validar este informe en www.alineaciones.cl</span>
-            <span id="qr-link-text" class="text-[10px] text-red-600 font-mono font-bold block mt-0.5"></span>
-          </div>
-        </div>
-
-        <div class="no-print flex gap-2 w-full md:w-auto">
-          <button type="button" onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded text-xs flex-1 md:flex-initial">
-            🖨️ Imprimir
-          </button>
-          <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2 rounded text-xs uppercase flex-1 md:flex-initial shadow-lg">
-            💾 Guardar en Supabase
-          </button>
-        </div>
-      </div>
-
-    </form>
   </div>
 
-  <script>
-    let supabaseClient = null;
+  <!-- Datos del Vehículo -->
+  <div class="grid-4">
+    <div>
+      <label>Patente</label>
+      <input type="text" placeholder="ABCD-12" id="patente">
+    </div>
+    <div>
+      <label>Marca / Modelo</label>
+      <input type="text" placeholder="Ej: Toyota Corolla" id="modelo">
+    </div>
+    <div>
+      <label>Kilometraje</label>
+      <input type="text" placeholder="85,000 km" id="km">
+    </div>
+    <div>
+      <label>Técnico</label>
+      <input type="text" placeholder="Nombre Operador" id="tecnico">
+    </div>
+  </div>
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      document.getElementById('fecha-str').value = new Date().toLocaleDateString('es-CL', opciones);
+  <!-- Inspección de Componentes -->
+  <section>
+    <h2>1. Inspección Previa del Tren Delantero</h2>
+    <div class="checklist">
+      <label class="check-item"><input type="checkbox"> Presión de Neumáticos OK</label>
+      <label class="check-item"><input type="checkbox"> Sin holgura en Rótulas / Axiales</label>
+      <label class="check-item"><input type="checkbox"> Estado de Bujes y Bandejas OK</label>
+      <label class="check-item"><input type="checkbox"> Amortiguadores sin fugas</label>
+    </div>
+  </section>
 
-      const savedUrl = localStorage.getItem('sb_url');
-      const savedKey = localStorage.getItem('sb_key');
-      if (savedUrl && savedKey) {
-        document.getElementById('supabase-url').value = savedUrl;
-        document.getElementById('supabase-key').value = savedKey;
-        conectarSupabase();
-      }
+  <!-- Tabla de Mediciones y Ajuste -->
+  <section>
+    <h2>2. Mediciones de Geometría</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Parámetro</th>
+          <th>Lado</th>
+          <th>Antes</th>
+          <th>Rango Tolerancia</th>
+          <th>Después</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Convergencia Delantera -->
+        <tr>
+          <td rowspan="2"><strong>Convergencia</strong><br><small>Delantera</small></td>
+          <td>Izquierdo</td>
+          <td><input type="text" placeholder="-0°15'"></td>
+          <td>0°00' a +0°10'</td>
+          <td><input type="text" placeholder="+0°05'"></td>
+          <td>
+            <div class="traffic-light">
+              <div class="status-btn green" onclick="setStatus(this)"></div>
+              <div class="status-btn yellow" onclick="setStatus(this)"></div>
+              <div class="status-btn red" onclick="setStatus(this)"></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>Derecho</td>
+          <td><input type="text" placeholder="-0°10'"></td>
+          <td>0°00' a +0°10'</td>
+          <td><input type="text" placeholder="+0°05'"></td>
+          <td>
+            <div class="traffic-light">
+              <div class="status-btn green" onclick="setStatus(this)"></div>
+              <div class="status-btn yellow" onclick="setStatus(this)"></div>
+              <div class="status-btn red" onclick="setStatus(this)"></div>
+            </div>
+          </td>
+        </tr>
+        <!-- Camber -->
+        <tr>
+          <td rowspan="2"><strong>Cámber (Inclinación)</strong><br><small>Delantero</small></td>
+          <td>Izquierdo</td>
+          <td><input type="text" placeholder="-1°20'"></td>
+          <td>-0°30' a -1°00'</td>
+          <td><input type="text" placeholder="-0°45'"></td>
+          <td>
+            <div class="traffic-light">
+              <div class="status-btn green" onclick="setStatus(this)"></div>
+              <div class="status-btn yellow" onclick="setStatus(this)"></div>
+              <div class="status-btn red" onclick="setStatus(this)"></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>Derecho</td>
+          <td><input type="text" placeholder="-0°40'"></td>
+          <td>-0°30' a -1°00'</td>
+          <td><input type="text" placeholder="-0°45'"></td>
+          <td>
+            <div class="traffic-light">
+              <div class="status-btn green" onclick="setStatus(this)"></div>
+              <div class="status-btn yellow" onclick="setStatus(this)"></div>
+              <div class="status-btn red" onclick="setStatus(this)"></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-      actualizarQR('13456', 'demo-token');
-    });
+  <!-- Diagnóstico Final / Recomendación -->
+  <section>
+    <h2>3. Resumen y Observaciones</h2>
+    <div class="grid-2">
+      <div>
+        <label>Estado Final del Vehículo</label>
+        <select id="estado-final">
+          <option value="ok">🟢 Apto / Alineación Exitosa</option>
+          <option value="warning">🟡 Alineado con Observaciones</option>
+          <option value="danger">🔴 Requiere Cambio de Piezas / Corrección Estructural</option>
+        </select>
+      </div>
+      <div>
+        <label>Próximo Control Recomendado</label>
+        <input type="text" value="10,000 km o en 6 meses">
+      </div>
+    </div>
+    <div style="margin-top: 10px;">
+      <label>Notas del Técnico / Recomendaciones</label>
+      <textarea rows="3" placeholder="Ej: Se sugiere rotación de neumáticos traseros por desgaste leve."></textarea>
+    </div>
+  </section>
 
-    function conectarSupabase() {
-      const url = document.getElementById('supabase-url').value.trim();
-      const key = document.getElementById('supabase-key').value.trim();
-      if (!url || !key) return;
+  <!-- Botones de Acción -->
+  <div class="actions">
+    <button class="btn btn-secondary" onclick="limpiarFormulario()">Limpiar</button>
+    <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+  </div>
+</div>
 
-      try {
-        supabaseClient = supabase.createClient(url, key);
-        localStorage.setItem('sb_url', url);
-        localStorage.setItem('sb_key', key);
-        document.getElementById('connection-status').innerText = 'CONECTADO A SUPABASE';
-        document.getElementById('connection-status').className = 'bg-green-600 text-white px-2 py-0.5 rounded text-[10px] font-bold';
-      } catch (err) {
-        console.error(err);
-      }
+<script>
+  // Autocompletar la fecha de hoy
+  document.getElementById('fecha').valueAsDate = new Date();
+
+  // Control del semáforo
+  function setStatus(element) {
+    const parent = element.parentElement;
+    const buttons = parent.querySelectorAll('.status-btn');
+    
+    // Si ya está activo, lo desactiva, si no, activa solo el seleccionado
+    const isActive = element.classList.contains('active');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    if (!isActive) {
+      element.classList.add('active');
     }
+  }
 
-    async function buscarVehiculoPorPatente(patenteIngresada) {
-      const patenteClean = patenteIngresada.trim().toUpperCase();
-      if (patenteClean.length < 5 || !supabaseClient) return;
-
-      try {
-        const { data } = await supabaseClient.from('vehiculos').select('*').eq('patente', patenteClean).single();
-        if (data) {
-          document.getElementById('marca').value = data.marca || '';
-          document.getElementById('modelo').value = data.modelo || '';
-          document.getElementById('anio').value = data.anio || '';
-          document.getElementById('numero_chasis').value = data.numero_chasis || '';
-          document.getElementById('rut').value = data.rut_propietario || '';
-          document.getElementById('nombre_propietario').value = data.nombre_propietario || '';
-        }
-      } catch (e) {}
+  // Limpiar campos del formulario
+  function limpiarFormulario() {
+    if (confirm('¿Deseas limpiar todos los campos del informe?')) {
+      document.querySelectorAll('input[type="text"], textarea').forEach(i => i.value = '');
+      document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+      document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
     }
+  }
+</script>
 
-    function actualizarQR(folio, token) {
-      const targetUrl = `https://www.alineaciones.cl/validar?folio=${folio}&token=${token}`;
-      document.getElementById('qr-link-text').innerText = targetUrl;
-      const qrContainer = document.getElementById('qrcode');
-      qrContainer.innerHTML = '';
-      new QRCode(qrContainer, { text: targetUrl, width: 64, height: 64 });
-    }
-  </script>
 </body>
 </html>
