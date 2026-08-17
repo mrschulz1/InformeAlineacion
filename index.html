@@ -2,447 +2,430 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <link rel="icon" type="image/png" href="logooriginal.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Informe Alineación</title>
+  <title>Informe Técnico de Geometría - Alineaciones Bustamante</title>
+  <link rel="icon" type="image/png" href="logooriginal.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    :root {
-      --bg-color: #f1f5f9;
-      --card-bg: #ffffff;
-      --text-color: #0f172a;
-      --border-color: #cbd5e1;
-      --primary: #0f172a;
-      --primary-accent: #2563eb;
-      --green: #22c55e;
-      --yellow: #eab308;
-      --red: #ef4444;
-    }
-
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-    body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
-
-    .container { max-width: 1050px; margin: 0 auto; background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-
-    /* Encabezado de Empresa y Folio */
-    .company-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 15px; margin-bottom: 20px; }
-    .brand-section { display: flex; align-items: center; gap: 15px; }
-    .logo-placeholder { width: 130px; height: 50px; border: 2px dashed #94a3b8; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #64748b; background: #f8fafc; }
-    .company-info h2 { margin: 0; font-size: 18px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
-    .company-info p { margin: 2px 0 0 0; font-size: 11px; color: #64748b; }
-    .doc-meta { text-align: right; }
-    .folio-box { background: #f8fafc; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; display: inline-block; text-align: center; }
-    .folio-box .label { font-size: 10px; font-weight: bold; color: #64748b; text-transform: uppercase; }
-    .folio-box .number { font-size: 16px; font-weight: bold; color: var(--red); display: block; }
-
-    /* Controles de Datos */
-    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-    label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #475569; text-transform: uppercase; }
-    input[type="text"], input[type="date"], select, textarea {
-      width: 100%; padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 12px; background: #fff;
-    }
-
-    /* Diagrama interactivo */
-    .diagram-container {
-      position: relative;
-      width: 100%;
-      height: 580px;
-      background: #f8fafc;
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
-
-    .car-svg { height: 480px; opacity: 0.85; }
-
-    /* Tarjetas de Medición */
-    .wheel-card {
-      position: absolute;
-      width: 270px;
-      background: #ffffff;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-
-    .wheel-card h3 {
-      margin: 0 0 8px 0;
-      font-size: 12px;
-      text-transform: uppercase;
-      color: var(--primary);
-      border-bottom: 1px solid #f1f5f9;
-      padding-bottom: 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .measure-header {
-      display: grid;
-      grid-template-columns: 75px 1fr 1fr;
-      gap: 4px;
-      font-size: 10px;
-      font-weight: bold;
-      color: #64748b;
-      text-align: center;
-      margin-bottom: 4px;
-    }
-
-    .measure-row {
-      display: grid;
-      grid-template-columns: 75px 1fr 1fr;
-      gap: 4px;
-      align-items: center;
-      margin-bottom: 5px;
-      font-size: 11px;
-    }
-
-    .measure-row input {
-      padding: 4px;
-      text-align: center;
-      font-size: 11px;
-      font-weight: bold;
-    }
-
-    /* Posicionamiento sobre la imagen */
-    .pos-front-left  { top: 15px; left: 15px; }
-    .pos-front-right { top: 15px; right: 15px; }
-    .pos-rear-left   { bottom: 15px; left: 15px; }
-    .pos-rear-right  { bottom: 15px; right: 15px; }
-
-    /* Semáforo */
-    .traffic-light { display: flex; gap: 4px; }
-    .status-btn {
-      width: 15px; height: 15px; border-radius: 50%; border: 1px solid #cbd5e1; cursor: pointer; opacity: 0.25; transition: all 0.2s;
-    }
-    .status-btn.green { background-color: var(--green); border-color: var(--green); }
-    .status-btn.yellow { background-color: var(--yellow); border-color: var(--yellow); }
-    .status-btn.red { background-color: var(--red); border-color: var(--red); }
-    .status-btn.active { opacity: 1; transform: scale(1.2); }
-
-    /* Centro - Geometría */
-    .center-card {
-      position: absolute;
-      bottom: 15px;
-      background: #ffffff;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 11px;
-      text-align: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    /* Pie de Página e Impresión */
-    .footer-section { margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px; }
-    .signatures-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; }
-    .signature-line { border-top: 1px dashed #94a3b8; text-align: center; padding-top: 6px; font-size: 11px; color: #475569; font-weight: bold; }
-    .disclaimer { font-size: 10px; color: #94a3b8; text-align: center; margin-top: 20px; line-height: 1.4; }
-
-    .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-    .btn { padding: 10px 18px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-secondary { background: #e2e8f0; color: #334155; }
-
     @media print {
-      body { background: white; padding: 0; }
-      .container { box-shadow: none; padding: 0; width: 100%; max-width: 100%; }
-      .actions, .status-btn:not(.active) { display: none !important; }
-      .status-btn.active { opacity: 1; transform: scale(1); border: none; }
-      .diagram-container { border: none; background: transparent; }
-      .logo-placeholder { border: 1px solid #cbd5e1; }
-      input, select, textarea { border: none !important; background: transparent !important; appearance: none; padding: 0; }
+      .no-print { display: none !important; }
+      body { background-color: #fff !important; padding: 0 !important; }
+      .print-shadow-none { shadow: none !important; border: none !important; }
+      input, select, textarea { border: none !important; background: transparent !important; appearance: none; padding: 0 !important; }
     }
   </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between p-4">
 
-<div class="container">
-  
-  <!-- ENCABEZADO DE LA EMPRESA Y FOLIO -->
-  <div class="company-header">
-    <div class="brand-section">
-      <!-- Reemplazar este div con <img src="logo.png" style="height: 50px;"> -->
+  <!-- Modal de Autenticación Genérico -->
+  <div id="loginModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-white p-6 rounded-2xl shadow-xl max-w-sm w-full border border-slate-200">
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-xl">🔑</div>
+        <h2 class="text-lg font-bold text-slate-900">Informe de Geometría</h2>
+        <h3 class="text-md font-semibold text-slate-700">Alineaciones Bustamante</h3>
+        <p class="text-xs text-slate-500 mt-1">Ingresa con credenciales del taller</p>
+      </div>
       
-      <!-- <div class="logo-placeholder">LOGO EMPRESA</div>-->
-      <img src="logooriginal.png" alt="Alineaciones Bustamante" class="h-16 mx-auto mb-3 object-contain">
-      <div class="company-info">
-        <h2>Alineaciones Bustamante</h2>
-        <p>Av Bustamante #640, Ñuñoa, Santiago | Tel: +56 9 8599 </p>
-        <p>Alineaciones.cl</p>
-      </div>
-    </div>
-    <div class="doc-meta">
-      <div class="folio-box">
-        <span class="label">Informe N°</span>
-        <span class="number" id="folio-num">FOL-00842</span>
-      </div>
-      <div style="margin-top: 5px;">
-        <label>Fecha</label>
-        <input type="date" id="fecha" style="font-size: 11px; padding: 2px 4px;">
-      </div>
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase">Correo Electrónico</label>
+          <input type="email" id="loginEmail" required class="mt-1 w-full rounded-lg border-slate-300 p-2.5 border text-sm focus:ring-indigo-500" placeholder="usuario@taller.cl">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase">Contraseña</label>
+          <input type="password" id="loginPassword" required class="mt-1 w-full rounded-lg border-slate-300 p-2.5 border text-sm focus:ring-indigo-500" placeholder="••••••••">
+        </div>
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg text-sm transition shadow-sm">
+          Iniciar Sesión
+        </button>
+      </form>
     </div>
   </div>
 
-  <!-- DATOS DEL CLIENTE Y VEHÍCULO -->
-  <div class="grid-4">
-    <div>
-      <label>Cliente / Nombre</label>
-      <input type="text" placeholder="Nombre completo" id="cliente">
-    </div>
-    <div>
-      <label>Patente</label>
-      <input type="text" placeholder="ABCD-12" id="patente" style="text-transform: uppercase;">
-    </div>
-    <div>
-      <label>Vehículo / Modelo</label>
-      <input type="text" placeholder="Ej: Audi A3 / Toyota RAV4" id="modelo">
-    </div>
-    <div>
-      <label>Técnico Operador</label>
-      <input type="text" placeholder="Nombre especialista" id="tecnico">
+  <!-- Botones de Navegación y Cerrar Sesión -->
+  <div class="flex justify-between items-center w-full max-w-5xl mx-auto mb-4 no-print">
+    <button id="btnCerrarSesion" class="text-xs bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg font-medium transition shadow-sm flex items-center gap-1">
+      🚪 Cerrar Sesión
+    </button>
+    <div class="flex gap-2">
+      <a href="vales.html" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition shadow-sm">
+        🎟️ Vales de Servicio
+      </a>
+      <a href="admin.html" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition shadow-sm">
+        ⚙️ Administración
+      </a>
     </div>
   </div>
 
-  <!-- DIAGRAMA VISUAL DEL VEHÍCULO -->
-  <div class="diagram-container">
+  <!-- Contenedor Principal del Informe -->
+  <div class="w-full max-w-5xl mx-auto bg-white p-6 rounded-xl shadow-sm border border-slate-200 print-shadow-none my-auto">
     
-    <svg class="car-svg" viewBox="0 0 200 400" fill="none">
-      <rect x="35" y="30" width="130" height="340" rx="40" fill="#e2e8f0" stroke="#94a3b8" stroke-width="3"/>
-      <path d="M 50 110 Q 100 95 150 110 L 142 140 Q 100 135 58 140 Z" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>
-      <path d="M 55 290 Q 100 300 145 290 L 140 315 Q 100 320 60 315 Z" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>
-      <rect x="52" y="145" width="96" height="135" rx="10" fill="#cbd5e1" opacity="0.5"/>
-      <rect x="18" y="55" width="22" height="50" rx="6" fill="#1e293b"/>
-      <rect x="160" y="55" width="22" height="50" rx="6" fill="#1e293b"/>
-      <rect x="18" y="295" width="22" height="50" rx="6" fill="#1e293b"/>
-      <rect x="160" y="295" width="22" height="50" rx="6" fill="#1e293b"/>
-      <line x1="40" y1="80" x2="160" y2="80" stroke="#64748b" stroke-width="2" stroke-dasharray="4"/>
-      <line x1="40" y1="320" x2="160" y2="320" stroke="#64748b" stroke-width="2" stroke-dasharray="4"/>
-      <line x1="100" y1="80" x2="100" y2="320" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6"/>
-    </svg>
-
-    <!-- RUEDA DELANTERA IZQUIERDA -->
-    <div class="wheel-card pos-front-left">
-      <h3>Delantera Izq.
-        <div class="traffic-light">
-          <div class="status-btn green" onclick="setStatus(this)"></div>
-          <div class="status-btn yellow" onclick="setStatus(this)"></div>
-          <div class="status-btn red" onclick="setStatus(this)"></div>
+    <!-- Encabezado con Logo y Folio -->
+    <div class="border-b pb-4 border-slate-200 mb-6 flex justify-between items-start">
+      <div class="flex items-center space-x-4">
+        <img src="logooriginal.png" alt="Alineaciones Bustamante" class="h-16 object-contain">
+        <div>
+          <h1 class="text-xl font-bold text-slate-800 tracking-tight uppercase">Informe Técnico de Geometría y Alineación</h1>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Alineaciones Bustamante</p>
         </div>
-      </h3>
-      <div class="measure-header">
-        <span>Parámetro</span><span>Antes</span><span>Después</span>
       </div>
-      <div class="measure-row">
-        <span>Converg.</span>
-        <input type="text" class="auto-format" placeholder="-0 15">
-        <input type="text" class="auto-format" placeholder="+0 05">
-      </div>
-      <div class="measure-row">
-        <span>Cámber</span>
-        <input type="text" class="auto-format" placeholder="-1 20">
-        <input type="text" class="auto-format" placeholder="-0 45">
-      </div>
-      <div class="measure-row">
-        <span>Cáster</span>
-        <input type="text" class="auto-format" placeholder="+2 50">
-        <input type="text" class="auto-format" placeholder="+3 10">
-      </div>
-    </div>
-
-    <!-- RUEDA DELANTERA DERECHA -->
-    <div class="wheel-card pos-front-right">
-      <h3>Delantera Der.
-        <div class="traffic-light">
-          <div class="status-btn green" onclick="setStatus(this)"></div>
-          <div class="status-btn yellow" onclick="setStatus(this)"></div>
-          <div class="status-btn red" onclick="setStatus(this)"></div>
+      <div class="text-right">
+        <div class="bg-slate-50 border border-slate-200 p-2 rounded-lg text-center min-w-[120px]">
+          <span class="block text-[10px] font-bold text-slate-400 uppercase">FOLIO INFORME</span>
+          <span id="folio" class="text-base font-bold text-indigo-600">FOL-0000</span>
         </div>
-      </h3>
-      <div class="measure-header">
-        <span>Parámetro</span><span>Antes</span><span>Después</span>
-      </div>
-      <div class="measure-row">
-        <span>Converg.</span>
-        <input type="text" class="auto-format" placeholder="-0 10">
-        <input type="text" class="auto-format" placeholder="+0 05">
-      </div>
-      <div class="measure-row">
-        <span>Cámber</span>
-        <input type="text" class="auto-format" placeholder="-0 40">
-        <input type="text" class="auto-format" placeholder="-0 45">
-      </div>
-      <div class="measure-row">
-        <span>Cáster</span>
-        <input type="text" class="auto-format" placeholder="+3 00">
-        <input type="text" class="auto-format" placeholder="+3 15">
-      </div>
-    </div>
-
-    <!-- RUEDA TRASERA IZQUIERDA -->
-    <div class="wheel-card pos-rear-left">
-      <h3>Trasera Izq.
-        <div class="traffic-light">
-          <div class="status-btn green" onclick="setStatus(this)"></div>
-          <div class="status-btn yellow" onclick="setStatus(this)"></div>
-          <div class="status-btn red" onclick="setStatus(this)"></div>
+        <div class="mt-2">
+          <input type="date" id="fecha" class="text-xs bg-slate-50 border border-slate-200 rounded px-2 py-1 text-slate-700">
         </div>
-      </h3>
-      <div class="measure-header">
-        <span>Parámetro</span><span>Antes</span><span>Después</span>
-      </div>
-      <div class="measure-row">
-        <span>Converg.</span>
-        <input type="text" class="auto-format" placeholder="+0 08">
-        <input type="text" class="auto-format" placeholder="+0 02">
-      </div>
-      <div class="measure-row">
-        <span>Cámber</span>
-        <input type="text" class="auto-format" placeholder="-1 15">
-        <input type="text" class="auto-format" placeholder="-1 00">
       </div>
     </div>
 
-    <!-- RUEDA TRASERA DERECHA -->
-    <div class="wheel-card pos-rear-right">
-      <h3>Trasera Der.
-        <div class="traffic-light">
-          <div class="status-btn green" onclick="setStatus(this)"></div>
-          <div class="status-btn yellow" onclick="setStatus(this)"></div>
-          <div class="status-btn red" onclick="setStatus(this)"></div>
+    <form id="informeForm">
+      <!-- Datos del Vehículo y Cliente -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cliente / Empresa</label>
+          <input type="text" id="cliente" placeholder="Nombre o Empresa" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all">
         </div>
-      </h3>
-      <div class="measure-header">
-        <span>Parámetro</span><span>Antes</span><span>Después</span>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Patente</label>
+          <div class="relative">
+            <i data-lucide="credit-card" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="patente" placeholder="ABCD12" required class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono tracking-wider text-slate-800 focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all uppercase">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Vehículo / Modelo</label>
+          <div class="relative">
+            <i data-lucide="car" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="modelo" placeholder="EJ: AUDI A3" class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all uppercase">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Técnico Operador</label>
+          <input type="text" id="tecnico" placeholder="Nombre Técnico" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all">
+        </div>
       </div>
-      <div class="measure-row">
-        <span>Converg.</span>
-        <input type="text" class="auto-format" placeholder="+0 05">
-        <input type="text" class="auto-format" placeholder="+0 02">
-      </div>
-      <div class="measure-row">
-        <span>Cámber</span>
-        <input type="text" class="auto-format" placeholder="-1 05">
-        <input type="text" class="auto-format" placeholder="-1 00">
-      </div>
-    </div>
 
-    <!-- CENTRO - ÁNGULO DE EMPUJE -->
-    <div class="center-card">
-      <strong>Ángulo Empuje:</strong>
-      <span>Antes:</span>
-      <input type="text" class="auto-format" placeholder="0 05" style="width: 50px; text-align: center;">
-      <span>Después:</span>
-      <input type="text" class="auto-format" placeholder="0 00" style="width: 50px; text-align: center;">
-    </div>
+      <!-- DIAGRAMA INTERACTIVO Y MEDICIONES -->
+      <div class="relative w-full h-[580px] bg-slate-50 border border-slate-200 rounded-xl mb-6 flex items-center justify-center overflow-hidden">
+        
+        <!-- SVG Vista Superior Vehículo -->
+        <svg class="h-[480px] opacity-80" viewBox="0 0 200 400" fill="none">
+          <rect x="35" y="30" width="130" height="340" rx="40" fill="#cbd5e1" stroke="#64748b" stroke-width="3"/>
+          <path d="M 50 110 Q 100 95 150 110 L 142 140 Q 100 135 58 140 Z" fill="#94a3b8" stroke="#64748b" stroke-width="2"/>
+          <path d="M 55 290 Q 100 300 145 290 L 140 315 Q 100 320 60 315 Z" fill="#94a3b8" stroke="#64748b" stroke-width="2"/>
+          <rect x="52" y="145" width="96" height="135" rx="10" fill="#94a3b8" opacity="0.4"/>
+          <rect x="18" y="55" width="22" height="50" rx="6" fill="#1e293b"/>
+          <rect x="160" y="55" width="22" height="50" rx="6" fill="#1e293b"/>
+          <rect x="18" y="295" width="22" height="50" rx="6" fill="#1e293b"/>
+          <rect x="160" y="295" width="22" height="50" rx="6" fill="#1e293b"/>
+          <line x1="40" y1="80" x2="160" y2="80" stroke="#475569" stroke-width="2" stroke-dasharray="4"/>
+          <line x1="40" y1="320" x2="160" y2="320" stroke="#475569" stroke-width="2" stroke-dasharray="4"/>
+          <line x1="100" y1="80" x2="100" y2="320" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6"/>
+        </svg>
 
+        <!-- DELANTERA IZQUIERDA -->
+        <div class="absolute top-4 left-4 bg-white border border-slate-200 rounded-lg p-3 shadow-sm w-64">
+          <div class="flex justify-between items-center mb-2 border-b pb-1">
+            <span class="text-xs font-bold text-slate-800 uppercase">Delantera Izq.</span>
+            <div class="flex gap-1">
+              <button type="button" class="w-3.5 h-3.5 rounded-full bg-emerald-500 opacity-30 hover:opacity-100 transition status-btn" onclick="setStatus(this)"></button>
+              <button type="button" class="w-3.5 h-3.5 rounded-full bg-amber-500 opacity-30 hover:opacity-100 transition status-btn" onclick="setStatus(this)"></button>
+              <button type="button" class="w-3.5 h-3.5 rounded-full bg-rose-500 opacity-30 hover:opacity-100 transition status-btn" onclick="setStatus(this)"></button>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-1 text-[10px] font-bold text-slate-400 text-center mb-1">
+            <span>MEDIDA</span><span>ANTES</span><span>DESPUÉS</span>
+          </div>
+          <div class="space-y-1.5 text-xs">
+            <div class="grid grid-cols-3 gap-1 items-center">
+              <span class="text-slate-600 font-medium">Converg.</span>
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="-0 15">
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="+0 05">
+            </div>
+            <div class="grid grid-cols-3 gap-1 items-center">
+              <span class="text-slate-600 font-medium">Cámber</span>
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="-1 20">
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="-0 45">
+            </div>
+            <div class="grid grid-cols-3 gap-1 items-center">
+              <span class="text-slate-600 font-medium">Cáster</span>
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="+2 50">
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="+3 10">
+            </div>
+          </div>
+        </div>
+
+        <!-- DELANTERA DERECHA -->
+        <div class="absolute top-4 right-4 bg-white border border-slate-200 rounded-lg p-3 shadow-sm w-64">
+          <div class="flex justify-between items-center mb-2 border-b pb-1">
+            <span class="text-xs font-bold text-slate-800 uppercase">Delantera Der.</span>
+            <div class="flex gap-1">
+              <button type="button" class="w-3.5 h-3.5 rounded-full bg-emerald-500 opacity-30 hover:opacity-100 transition status-btn" onclick="setStatus(this)"></button>
+              <button type="button" class="w-3.5 h-3.5 rounded-full bg-amber-500 opacity-30 hover:opacity-100 transition status-btn" onclick="setStatus(this)"></button>
+              <button type="button" class="w-3.5 h-3.5 rounded-full bg-rose-500 opacity-30 hover:opacity-100 transition status-btn" onclick="setStatus(this)"></button>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-1 text-[10px] font-bold text-slate-400 text-center mb-1">
+            <span>MEDIDA</span><span>ANTES</span><span>DESPUÉS</span>
+          </div>
+          <div class="space-y-1.5 text-xs">
+            <div class="grid grid-cols-3 gap-1 items-center">
+              <span class="text-slate-600 font-medium">Converg.</span>
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="-0 10">
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="+0 05">
+            </div>
+            <div class="grid grid-cols-3 gap-1 items-center">
+              <span class="text-slate-600 font-medium">Cámber</span>
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="-0 40">
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="-0 45">
+            </div>
+            <div class="grid grid-cols-3 gap-1 items-center">
+              <span class="text-slate-600 font-medium">Cáster</span>
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="+3 00">
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="+3 15">
+            </div>
+          </div>
+        </div>
+
+        <!-- TRASERA IZQUIERDA -->
+        <div class="absolute bottom-4 left-4 bg-white border border-slate-200 rounded-lg p-3 shadow-sm w-64">
+          <div class="flex justify-between items-center mb-2 border-b pb-1">
+            <span class="text-xs font-bold text-slate-800 uppercase">Trasera Izq.</span>
+            <div class="flex gap-1">
+              <button type="button" class="w-3.5 h-3.5 rounded-full bg-emerald-500 opacity-30 hover:opacity-100 transition status-btn" onclick="setStatus(this)"></button>
+              <button type="button" class="w-3.5 h-3.5 rounded-full bg-amber-500 opacity-30 hover:opacity-100 transition status-btn" onclick="setStatus(this)"></button>
+              <button type="button" class="w-3.5 h-3.5 rounded-full bg-rose-500 opacity-30 hover:opacity-100 transition status-btn" onclick="setStatus(this)"></button>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-1 text-[10px] font-bold text-slate-400 text-center mb-1">
+            <span>MEDIDA</span><span>ANTES</span><span>DESPUÉS</span>
+          </div>
+          <div class="space-y-1.5 text-xs">
+            <div class="grid grid-cols-3 gap-1 items-center">
+              <span class="text-slate-600 font-medium">Converg.</span>
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="+0 08">
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="+0 02">
+            </div>
+            <div class="grid grid-cols-3 gap-1 items-center">
+              <span class="text-slate-600 font-medium">Cámber</span>
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="-1 15">
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="-1 00">
+            </div>
+          </div>
+        </div>
+
+        <!-- TRASERA DERECHA -->
+        <div class="absolute bottom-4 right-4 bg-white border border-slate-200 rounded-lg p-3 shadow-sm w-64">
+          <div class="flex justify-between items-center mb-2 border-b pb-1">
+            <span class="text-xs font-bold text-slate-800 uppercase">Trasera Der.</span>
+            <div class="flex gap-1">
+              <button type="button" class="w-3.5 h-3.5 rounded-full bg-emerald-500 opacity-30 hover:opacity-100 transition status-btn" onclick="setStatus(this)"></button>
+              <button type="button" class="w-3.5 h-3.5 rounded-full bg-amber-500 opacity-30 hover:opacity-100 transition status-btn" onclick="setStatus(this)"></button>
+              <button type="button" class="w-3.5 h-3.5 rounded-full bg-rose-500 opacity-30 hover:opacity-100 transition status-btn" onclick="setStatus(this)"></button>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-1 text-[10px] font-bold text-slate-400 text-center mb-1">
+            <span>MEDIDA</span><span>ANTES</span><span>DESPUÉS</span>
+          </div>
+          <div class="space-y-1.5 text-xs">
+            <div class="grid grid-cols-3 gap-1 items-center">
+              <span class="text-slate-600 font-medium">Converg.</span>
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="+0 05">
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="+0 02">
+            </div>
+            <div class="grid grid-cols-3 gap-1 items-center">
+              <span class="text-slate-600 font-medium">Cámber</span>
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="-1 05">
+              <input type="text" class="auto-format px-1 py-0.5 text-center bg-slate-50 border rounded font-mono text-xs" placeholder="-1 00">
+            </div>
+          </div>
+        </div>
+
+        <!-- ÁNGULO DE EMPUJE -->
+        <div class="absolute bottom-4 bg-white border border-slate-200 rounded-lg px-4 py-2 shadow-sm flex items-center space-x-3 text-xs">
+          <span class="font-bold text-slate-700">ÁNGULO DE EMPUJE:</span>
+          <span class="text-slate-500">Antes:</span>
+          <input type="text" class="auto-format w-14 px-1 py-0.5 text-center bg-slate-50 border rounded font-mono font-bold" placeholder="0 05">
+          <span class="text-slate-500">Después:</span>
+          <input type="text" class="auto-format w-14 px-1 py-0.5 text-center bg-slate-50 border rounded font-mono font-bold" placeholder="0 00">
+        </div>
+
+      </div>
+
+      <!-- RESULTADO Y OBSERVACIONES -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Diagnóstico General</label>
+          <select id="estado_general" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:bg-white focus:border-indigo-600">
+            <option value="ok">🟢 Geometría en Tolerancia Óptima</option>
+            <option value="warning">🟡 Alineado con Desgaste / Observaciones</option>
+            <option value="danger">🔴 Desviación Severa / Daño Estructural</option>
+          </select>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Observaciones Técnicas</label>
+          <textarea id="observaciones" rows="2" placeholder="Detalles sobre bujes, deformación de chasis, desgaste de neumáticos..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:bg-white focus:border-indigo-600"></textarea>
+        </div>
+      </div>
+
+      <!-- PIE DE PÁGINA Y FIRMAS -->
+      <div class="border-t border-slate-200 pt-6 mt-6">
+        <div class="grid grid-cols-2 gap-12 text-center my-4">
+          <div class="border-t border-dashed border-slate-400 pt-2 text-xs font-bold text-slate-600">
+            Firma / Timbre Técnico
+          </div>
+          <div class="border-t border-dashed border-slate-400 pt-2 text-xs font-bold text-slate-600">
+            Conforme Recepción Cliente
+          </div>
+        </div>
+        <p class="text-[10px] text-slate-400 text-center mt-6">
+          Alineaciones Bustamante • Certificado de geometría y alineación de trenes bajo tolerancias de fabricante. Garantía válida por 30 días o 1,000 km.
+        </p>
+      </div>
+
+      <!-- BOTONES DE ACCIÓN -->
+      <div class="mt-6 flex justify-end gap-3 no-print">
+        <button type="button" onclick="window.print()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-sm transition flex items-center gap-2">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>Imprimir / PDF</span>
+        </button>
+        <button type="submit" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-2.5 px-5 rounded-xl shadow-md transition flex items-center gap-2">
+          <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+          <span>Guardar Informe</span>
+        </button>
+      </div>
+    </form>
   </div>
 
-  <!-- OBSERVACIONES Y ESTADO -->
-  <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
-    <div>
-      <label>Resultado Global</label>
-      <select id="estado-general">
-        <option value="ok">🟢 Geometría en Tolerancia Óptima</option>
-        <option value="warning">🟡 Alineado con Desgaste / Revisar Bujes</option>
-        <option value="danger">🔴 Desviación Severa / Requiere Reparación</option>
-      </select>
-    </div>
-    <div>
-      <label>Observaciones del Técnico</label>
-      <textarea rows="2" placeholder="Ej: Se corrigió la convergencia del eje delantero. Se sugiere rotación de neumáticos en 5,000 km."></textarea>
-    </div>
+  <div class="text-center text-xs text-slate-400 py-4 no-print">
+    Alineaciones Bustamante © 2026
   </div>
 
-  <!-- PIE DE PÁGINA (FIRMAS Y DISCLAIMER) -->
-  <div class="footer-section">
-    <div class="signatures-grid">
-      <div class="signature-line">
-        Firma / Timbre del Técnico
-      </div>
-      <div class="signature-line">
-        Conforme Cliente / Recepción
-      </div>
-    </div>
-    <div class="disclaimer">
-      Este informe certifica las mediciones de geometría tomadas bajo los parámetros del fabricante al momento del servicio.<br>
-      Garantía de alineación válida por 30 días o 1,000 km previa inspección del estado de los neumáticos y componentes de suspensión.
-    </div>
-  </div>
+  <script>
+    // Lucide Icons
+    lucide.createIcons();
 
-  <!-- BOTONES DE ACCIÓN -->
-  <div class="actions">
-    <button class="btn btn-secondary" onclick="limpiar()">Limpiar Formulario</button>
-    <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
-  </div>
+    // Inicializar Supabase
+    const SUPABASE_URL = "https://okkydrwdexacxvfbtopb.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_XY2XRiAQw4tQdygSAwd4XA_pRETQ_EA";
+    const { createClient } = supabase;
+    const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-</div>
+    // DOM Elements
+    const loginModal = document.getElementById('loginModal');
+    const loginForm = document.getElementById('loginForm');
+    const btnCerrarSesion = document.getElementById('btnCerrarSesion');
+    const form = document.getElementById('informeForm');
 
-<script>
-  document.getElementById('fecha').valueAsDate = new Date();
+    document.getElementById('fecha').valueAsDate = new Date();
 
-  function setStatus(btn) {
-    const parent = btn.parentElement;
-    const buttons = parent.querySelectorAll('.status-btn');
-    const isActive = btn.classList.contains('active');
-    
-    buttons.forEach(b => b.classList.remove('active'));
-    if (!isActive) {
-      btn.classList.add('active');
-    }
-  }
-
-  // AUTOMATIZACIÓN DE FORMATEO (° ' " /)
-  document.querySelectorAll('.auto-format').forEach(input => {
-    input.addEventListener('blur', function() {
-      let val = this.value.trim();
-      if (!val) return;
-
-      if (val.includes('/')) {
-        let parts = val.split('/');
-        this.value = parts.map(p => formatValue(p.trim())).join(' / ');
+    // Autenticación
+    async function verificarSesion() {
+      const { data: { session } } = await client.auth.getSession();
+      if (session) {
+        loginModal.classList.add('hidden');
       } else {
-        this.value = formatValue(val);
+        loginModal.classList.remove('hidden');
+      }
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      const { error } = await client.auth.signInWithPassword({ email, password });
+      if (error) {
+        alert('Credenciales incorrectas: ' + error.message);
+      } else {
+        loginModal.classList.add('hidden');
       }
     });
-  });
 
-  function formatValue(val) {
-    if (!val) return '';
-    
-    // Si escribe números separados por espacio ("0 15" -> "0°15'")
-    if (/^[+-]?\d+\s+\d+$/.test(val)) {
-      let parts = val.split(/\s+/);
-      return `${parts[0]}°${parts[1]}'`;
+    btnCerrarSesion.addEventListener('click', async () => {
+      await client.auth.signOut();
+      window.location.reload();
+    });
+
+    verificarSesion();
+
+    // Semáforo Interactivo
+    function setStatus(btn) {
+      const parent = btn.parentElement;
+      const buttons = parent.querySelectorAll('.status-btn');
+      const isSelected = btn.classList.contains('ring-2');
+
+      buttons.forEach(b => b.classList.remove('ring-2', 'ring-offset-1', 'ring-slate-800', 'opacity-100'));
+      buttons.forEach(b => b.classList.add('opacity-30'));
+
+      if (!isSelected) {
+        btn.classList.remove('opacity-30');
+        btn.classList.add('opacity-100', 'ring-2', 'ring-offset-1', 'ring-slate-800');
+      }
     }
-    
-    // Si escribe número entero ("15" -> "15°")
-    if (/^[+-]?\d+$/.test(val) && !val.includes('°') && !val.includes('"')) {
-      return `${val}°`;
+
+    // Formateo automático (° ' " /)
+    document.querySelectorAll('.auto-format').forEach(input => {
+      input.addEventListener('blur', function() {
+        let val = this.value.trim();
+        if (!val) return;
+
+        if (val.includes('/')) {
+          let parts = val.split('/');
+          this.value = parts.map(p => formatValue(p.trim())).join(' / ');
+        } else {
+          this.value = formatValue(val);
+        }
+      });
+    });
+
+    function formatValue(val) {
+      if (!val) return '';
+      if (/^[+-]?\d+\s+\d+$/.test(val)) {
+        let parts = val.split(/\s+/);
+        return `${parts[0]}°${parts[1]}'`;
+      }
+      if (/^[+-]?\d+$/.test(val) && !val.includes('°') && !val.includes('"')) {
+        return `${val}°`;
+      }
+      if (val.endsWith('in') || val.endsWith('pulg')) {
+        return val.replace(/(in|pulg)/g, '').trim() + '"';
+      }
+      return val;
     }
 
-    // Si indica pulgadas ("1/4 in" -> "1/4"")
-    if (val.endsWith('in') || val.endsWith('pulg')) {
-      return val.replace(/(in|pulg)/g, '').trim() + '"';
-    }
+    // Guardar Informe en Supabase
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-    return val;
-  }
+      const patente = document.getElementById('patente').value.toUpperCase().trim();
+      
+      const payload = {
+        cliente: document.getElementById('cliente').value,
+        patente: patente,
+        modelo: document.getElementById('modelo').value,
+        tecnico: document.getElementById('tecnico').value,
+        fecha: document.getElementById('fecha').value,
+        estado_general: document.getElementById('estado_general').value,
+        observaciones: document.getElementById('observaciones').value,
+      };
 
-  function limpiar() {
-    if (confirm('¿Desea limpiar los campos del informe?')) {
-      document.querySelectorAll('input[type="text"], textarea').forEach(i => i.value = '');
-      document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
-    }
-  }
-</script>
+      const { data, error } = await client
+        .from('informes_geometria')
+        .insert([payload])
+        .select();
 
+      if (error) {
+        alert('Error al guardar el informe: ' + error.message);
+      } else {
+        alert(`¡Informe Guardado con Éxito! Folio: FOL-${data[0].id || 'OK'}`);
+      }
+    });
+  </script>
 </body>
 </html>
