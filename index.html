@@ -3,71 +3,136 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Informe Técnico de Alineación</title>
+  <title>Informe Técnico de Alineación y Geometría</title>
   <style>
     :root {
-      --bg-color: #f4f6f9;
+      --bg-color: #f1f5f9;
       --card-bg: #ffffff;
-      --text-color: #333333;
-      --border-color: #dde2e5;
-      --primary: #1e293b;
+      --text-color: #1e293b;
+      --border-color: #cbd5e1;
+      --primary: #0f172a;
       --green: #22c55e;
       --yellow: #eab308;
       --red: #ef4444;
     }
 
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
     body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
 
-    .container { max-width: 900px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .container { max-width: 960px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
     .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 15px; margin-bottom: 20px; }
-    .header h1 { margin: 0; font-size: 24px; color: var(--primary); text-transform: uppercase; }
-    .header .subtitle { font-size: 14px; color: #64748b; margin-top: 4px; }
+    .header h1 { margin: 0; font-size: 22px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+    .header .subtitle { font-size: 13px; color: #64748b; margin-top: 4px; }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
     .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-
-    label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #475569; text-transform: uppercase; }
+    label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #475569; text-transform: uppercase; }
     input[type="text"], input[type="date"], select, textarea {
-      width: 100%; padding: 8px 12px; border: 1fr solid var(--border-color); border-radius: 6px; font-size: 14px; background: #fff;
+      width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; background: #fff;
     }
 
-    section { margin-bottom: 25px; }
-    section h2 { font-size: 16px; border-left: 4px solid var(--primary); padding-left: 8px; margin-bottom: 12px; color: var(--primary); }
+    /* Esquema Visual del Auto */
+    .diagram-container {
+      position: relative;
+      width: 100%;
+      height: 520px;
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
 
-    /* Tabla de mediciones */
-    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-    th, td { border: 1px solid var(--border-color); padding: 10px; text-align: center; font-size: 14px; }
-    th { background-color: #f8fafc; color: #334155; font-weight: 600; }
+    /* SVG del Vehículo */
+    .car-svg {
+      height: 440px;
+      opacity: 0.85;
+    }
 
-    /* Semáforo interactivo */
-    .traffic-light { display: flex; justify-content: center; gap: 8px; }
+    /* Tarjetas de Medición posicionadas sobre el diagrama */
+    .wheel-card {
+      position: absolute;
+      width: 210px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .wheel-card h3 {
+      margin: 0 0 8px 0;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--primary);
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .measure-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+
+    .measure-row input {
+      width: 65px;
+      padding: 4px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    /* Posicionamiento de las ruedas */
+    .pos-front-left  { top: 20px; left: 20px; }
+    .pos-front-right { top: 20px; right: 20px; }
+    .pos-rear-left   { bottom: 20px; left: 20px; }
+    .pos-rear-right  { bottom: 20px; right: 20px; }
+
+    /* Semáforo visual */
+    .traffic-light { display: flex; gap: 4px; }
     .status-btn {
-      width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1; cursor: pointer; opacity: 0.3; transition: all 0.2s;
+      width: 16px; height: 16px; border-radius: 50%; border: 1px solid #cbd5e1; cursor: pointer; opacity: 0.25; transition: all 0.2s;
     }
     .status-btn.green { background-color: var(--green); border-color: var(--green); }
     .status-btn.yellow { background-color: var(--yellow); border-color: var(--yellow); }
     .status-btn.red { background-color: var(--red); border-color: var(--red); }
-    .status-btn.active { opacity: 1; transform: scale(1.25); box-shadow: 0 0 8px rgba(0,0,0,0.2); }
+    .status-btn.active { opacity: 1; transform: scale(1.2); }
 
-    /* Checklist */
-    .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8fafc; padding: 15px; border-radius: 8px; }
-    .check-item { display: flex; align-items: center; gap: 8px; font-size: 14px; }
-    .check-item input { width: 18px; height: 18px; cursor: pointer; }
+    /* Línea indicadora de Chasis / Geometría Central */
+    .center-card {
+      position: absolute;
+      bottom: 20px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 11px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
 
-    /* Botones de acción */
-    .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-    .btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
+    /* Botones de Acción */
+    .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
+    .btn { padding: 10px 18px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
     .btn-primary { background: var(--primary); color: white; }
     .btn-secondary { background: #e2e8f0; color: #334155; }
 
-    /* Estilos para impresión / PDF */
+    /* Estilos de Impresión / PDF */
     @media print {
       body { background: white; padding: 0; }
       .container { box-shadow: none; padding: 0; width: 100%; max-width: 100%; }
       .actions, .status-btn:not(.active) { display: none !important; }
       .status-btn.active { opacity: 1; transform: scale(1); border: none; }
+      .diagram-container { border: none; background: transparent; }
       input, select, textarea { border: none !important; background: transparent !important; appearance: none; padding: 0; }
     }
   </style>
@@ -78,8 +143,8 @@
   <!-- Encabezado -->
   <div class="header">
     <div>
-      <h1>Informe Técnico de Alineación</h1>
-      <div class="subtitle">Centro Especializado de Geometría Automotriz</div>
+      <h1>Informe Visual de Geometría y Alineación</h1>
+      <div class="subtitle">Diagnóstico Estructural y Deformación de Trenes</div>
     </div>
     <div style="text-align: right;">
       <label>Fecha</label>
@@ -94,158 +159,175 @@
       <input type="text" placeholder="ABCD-12" id="patente">
     </div>
     <div>
-      <label>Marca / Modelo</label>
-      <input type="text" placeholder="Ej: Toyota Corolla" id="modelo">
+      <label>Vehículo</label>
+      <input type="text" placeholder="Marca / Modelo" id="modelo">
     </div>
     <div>
       <label>Kilometraje</label>
-      <input type="text" placeholder="85,000 km" id="km">
+      <input type="text" placeholder="Ej: 85,000 km" id="km">
     </div>
     <div>
       <label>Técnico</label>
-      <input type="text" placeholder="Nombre Operador" id="tecnico">
+      <input type="text" placeholder="Operador" id="tecnico">
     </div>
   </div>
 
-  <!-- Inspección de Componentes -->
-  <section>
-    <h2>1. Inspección Previa del Tren Delantero</h2>
-    <div class="checklist">
-      <label class="check-item"><input type="checkbox"> Presión de Neumáticos OK</label>
-      <label class="check-item"><input type="checkbox"> Sin holgura en Rótulas / Axiales</label>
-      <label class="check-item"><input type="checkbox"> Estado de Bujes y Bandejas OK</label>
-      <label class="check-item"><input type="checkbox"> Amortiguadores sin fugas</label>
-    </div>
-  </section>
+  <!-- DIAGRAMA VISUAL DEL AUTO CON MEDIDAS -->
+  <div class="diagram-container">
+    
+    <!-- Vector del Auto (Vista Superior) -->
+    <svg class="car-svg" viewBox="0 0 200 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Cuerpo del Auto -->
+      <rect x="35" y="30" width="130" height="340" rx="40" fill="#e2e8f0" stroke="#94a3b8" stroke-width="3"/>
+      <!-- Parabrisas Delantero -->
+      <path d="M 50 110 Q 100 95 150 110 L 142 140 Q 100 135 58 140 Z" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>
+      <!-- Parabrisas Trasero -->
+      <path d="M 55 290 Q 100 300 145 290 L 140 315 Q 100 320 60 315 Z" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>
+      <!-- Techo -->
+      <rect x="52" y="145" width="96" height="135" rx="10" fill="#cbd5e1" opacity="0.5"/>
+      <!-- Ruedas -->
+      <rect x="18" y="55" width="22" height="50" rx="6" fill="#1e293b"/> <!-- Del. Izq -->
+      <rect x="160" y="55" width="22" height="50" rx="6" fill="#1e293b"/> <!-- Del. Der -->
+      <rect x="18" y="295" width="22" height="50" rx="6" fill="#1e293b"/> <!-- Tras. Izq -->
+      <rect x="160" y="295" width="22" height="50" rx="6" fill="#1e293b"/> <!-- Tras. Der -->
+      <!-- Ejes -->
+      <line x1="40" y1="80" x2="160" y2="80" stroke="#64748b" stroke-width="2" stroke-dasharray="4"/>
+      <line x1="40" y1="320" x2="160" y2="320" stroke="#64748b" stroke-width="2" stroke-dasharray="4"/>
+      <line x1="100" y1="80" x2="100" y2="320" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6"/>
+    </svg>
 
-  <!-- Tabla de Mediciones y Ajuste -->
-  <section>
-    <h2>2. Mediciones de Geometría</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Parámetro</th>
-          <th>Lado</th>
-          <th>Antes</th>
-          <th>Rango Tolerancia</th>
-          <th>Después</th>
-          <th>Estado</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Convergencia Delantera -->
-        <tr>
-          <td rowspan="2"><strong>Convergencia</strong><br><small>Delantera</small></td>
-          <td>Izquierdo</td>
-          <td><input type="text" placeholder="-0°15'"></td>
-          <td>0°00' a +0°10'</td>
-          <td><input type="text" placeholder="+0°05'"></td>
-          <td>
-            <div class="traffic-light">
-              <div class="status-btn green" onclick="setStatus(this)"></div>
-              <div class="status-btn yellow" onclick="setStatus(this)"></div>
-              <div class="status-btn red" onclick="setStatus(this)"></div>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td>Derecho</td>
-          <td><input type="text" placeholder="-0°10'"></td>
-          <td>0°00' a +0°10'</td>
-          <td><input type="text" placeholder="+0°05'"></td>
-          <td>
-            <div class="traffic-light">
-              <div class="status-btn green" onclick="setStatus(this)"></div>
-              <div class="status-btn yellow" onclick="setStatus(this)"></div>
-              <div class="status-btn red" onclick="setStatus(this)"></div>
-            </div>
-          </td>
-        </tr>
-        <!-- Camber -->
-        <tr>
-          <td rowspan="2"><strong>Cámber (Inclinación)</strong><br><small>Delantero</small></td>
-          <td>Izquierdo</td>
-          <td><input type="text" placeholder="-1°20'"></td>
-          <td>-0°30' a -1°00'</td>
-          <td><input type="text" placeholder="-0°45'"></td>
-          <td>
-            <div class="traffic-light">
-              <div class="status-btn green" onclick="setStatus(this)"></div>
-              <div class="status-btn yellow" onclick="setStatus(this)"></div>
-              <div class="status-btn red" onclick="setStatus(this)"></div>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td>Derecho</td>
-          <td><input type="text" placeholder="-0°40'"></td>
-          <td>-0°30' a -1°00'</td>
-          <td><input type="text" placeholder="-0°45'"></td>
-          <td>
-            <div class="traffic-light">
-              <div class="status-btn green" onclick="setStatus(this)"></div>
-              <div class="status-btn yellow" onclick="setStatus(this)"></div>
-              <div class="status-btn red" onclick="setStatus(this)"></div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- Diagnóstico Final / Recomendación -->
-  <section>
-    <h2>3. Resumen y Observaciones</h2>
-    <div class="grid-2">
-      <div>
-        <label>Estado Final del Vehículo</label>
-        <select id="estado-final">
-          <option value="ok">🟢 Apto / Alineación Exitosa</option>
-          <option value="warning">🟡 Alineado con Observaciones</option>
-          <option value="danger">🔴 Requiere Cambio de Piezas / Corrección Estructural</option>
-        </select>
+    <!-- RUEDA DELANTERA IZQUIERDA -->
+    <div class="wheel-card pos-front-left">
+      <h3>Delantera Izq.
+        <div class="traffic-light">
+          <div class="status-btn green" onclick="setStatus(this)"></div>
+          <div class="status-btn yellow" onclick="setStatus(this)"></div>
+          <div class="status-btn red" onclick="setStatus(this)"></div>
+        </div>
+      </h3>
+      <div class="measure-row">
+        <span>Convergencia:</span>
+        <input type="text" placeholder="+0°05'">
       </div>
-      <div>
-        <label>Próximo Control Recomendado</label>
-        <input type="text" value="10,000 km o en 6 meses">
+      <div class="measure-row">
+        <span>Cámber:</span>
+        <input type="text" placeholder="-0°45'">
+      </div>
+      <div class="measure-row">
+        <span>Cáster:</span>
+        <input type="text" placeholder="+3°10'">
       </div>
     </div>
-    <div style="margin-top: 10px;">
-      <label>Notas del Técnico / Recomendaciones</label>
-      <textarea rows="3" placeholder="Ej: Se sugiere rotación de neumáticos traseros por desgaste leve."></textarea>
-    </div>
-  </section>
 
-  <!-- Botones de Acción -->
+    <!-- RUEDA DELANTERA DERECHA -->
+    <div class="wheel-card pos-front-right">
+      <h3>Delantera Der.
+        <div class="traffic-light">
+          <div class="status-btn green" onclick="setStatus(this)"></div>
+          <div class="status-btn yellow" onclick="setStatus(this)"></div>
+          <div class="status-btn red" onclick="setStatus(this)"></div>
+        </div>
+      </h3>
+      <div class="measure-row">
+        <span>Convergencia:</span>
+        <input type="text" placeholder="+0°05'">
+      </div>
+      <div class="measure-row">
+        <span>Cámber:</span>
+        <input type="text" placeholder="-0°45'">
+      </div>
+      <div class="measure-row">
+        <span>Cáster:</span>
+        <input type="text" placeholder="+3°15'">
+      </div>
+    </div>
+
+    <!-- RUEDA TRASERA IZQUIERDA -->
+    <div class="wheel-card pos-rear-left">
+      <h3>Trasera Izq.
+        <div class="traffic-light">
+          <div class="status-btn green" onclick="setStatus(this)"></div>
+          <div class="status-btn yellow" onclick="setStatus(this)"></div>
+          <div class="status-btn red" onclick="setStatus(this)"></div>
+        </div>
+      </h3>
+      <div class="measure-row">
+        <span>Convergencia:</span>
+        <input type="text" placeholder="+0°02'">
+      </div>
+      <div class="measure-row">
+        <span>Cámber:</span>
+        <input type="text" placeholder="-1°00'">
+      </div>
+    </div>
+
+    <!-- RUEDA TRASERA DERECHA -->
+    <div class="wheel-card pos-rear-right">
+      <h3>Trasera Der.
+        <div class="traffic-light">
+          <div class="status-btn green" onclick="setStatus(this)"></div>
+          <div class="status-btn yellow" onclick="setStatus(this)"></div>
+          <div class="status-btn red" onclick="setStatus(this)"></div>
+        </div>
+      </h3>
+      <div class="measure-row">
+        <span>Convergencia:</span>
+        <input type="text" placeholder="+0°02'">
+      </div>
+      <div class="measure-row">
+        <span>Cámber:</span>
+        <input type="text" placeholder="-1°00'">
+      </div>
+    </div>
+
+    <!-- CONTROL CENTRAL DE GEOMETRÍA DE CHASIS -->
+    <div class="center-card">
+      <strong>Ángulo de Empuje / Cuadratura:</strong>
+      <input type="text" placeholder="0°00'" style="width: 70px; text-align: center; font-weight: bold; margin-left: 5px;">
+    </div>
+
+  </div>
+
+  <!-- Resumen para el Cliente -->
+  <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
+    <div>
+      <label>Diagnóstico General</label>
+      <select id="estado-general">
+        <option value="ok">🟢 Geometría y Alineación Correctas</option>
+        <option value="warning">🟡 Alineado con Desgaste / Observaciones</option>
+        <option value="danger">🔴 Desalineación Severa / Daño Estructural</option>
+      </select>
+    </div>
+    <div>
+      <label>Observaciones del Técnico</label>
+      <textarea rows="2" placeholder="Ej: Se observa ligera deformación en el eje delantero derecho. Se ajustó convergencia al rango óptimo."></textarea>
+    </div>
+  </div>
+
+  <!-- Acciones -->
   <div class="actions">
-    <button class="btn btn-secondary" onclick="limpiarFormulario()">Limpiar</button>
+    <button class="btn btn-secondary" onclick="limpiar()">Limpiar Formulario</button>
     <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
   </div>
 </div>
 
 <script>
-  // Autocompletar la fecha de hoy
   document.getElementById('fecha').valueAsDate = new Date();
 
-  // Control del semáforo
-  function setStatus(element) {
-    const parent = element.parentElement;
+  function setStatus(btn) {
+    const parent = btn.parentElement;
     const buttons = parent.querySelectorAll('.status-btn');
+    const isActive = btn.classList.contains('active');
     
-    // Si ya está activo, lo desactiva, si no, activa solo el seleccionado
-    const isActive = element.classList.contains('active');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    
+    buttons.forEach(b => b.classList.remove('active'));
     if (!isActive) {
-      element.classList.add('active');
+      btn.classList.add('active');
     }
   }
 
-  // Limpiar campos del formulario
-  function limpiarFormulario() {
-    if (confirm('¿Deseas limpiar todos los campos del informe?')) {
+  function limpiar() {
+    if (confirm('¿Limpiar los datos del informe?')) {
       document.querySelectorAll('input[type="text"], textarea').forEach(i => i.value = '');
-      document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
       document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
     }
   }
