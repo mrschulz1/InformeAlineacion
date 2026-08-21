@@ -522,48 +522,55 @@
     }
 
     // 5. GUARDAR EN LA BASE DE DATOS E IMPRIMIR DE FORMA AUTOMÁTICA
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    // 5. GUARDAR EN LA BASE DE DATOS E IMPRIMIR
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-      const btn = document.getElementById('btnImprimirGuardar');
-      btn.disabled = true;
-      btn.classList.add('opacity-50');
+  const btn = document.getElementById('btnImprimirGuardar');
+  btn.disabled = true;
+  btn.classList.add('opacity-50');
 
-      const patente = document.getElementById('patente').value.toUpperCase().trim();
-      
-      const payload = {
-        patente: patente,
-        marca: document.getElementById('marca').value,
-        modelo: document.getElementById('modelo').value,
-        anio: document.getElementById('anio').value,
-        vin: document.getElementById('vin').value,
-        cliente: document.getElementById('cliente').value,
-        tecnico: document.getElementById('tecnico').value,
-        fecha: document.getElementById('fecha').value,
-        estado_general: document.getElementById('estado_general').value,
-        observaciones: document.getElementById('observaciones').value
-      };
+  const patente = document.getElementById('patente').value.toUpperCase().trim();
+  
+  const payload = {
+    patente: patente,
+    marca: document.getElementById('marca').value,
+    modelo: document.getElementById('modelo').value,
+    anio: document.getElementById('anio').value,
+    vin: document.getElementById('vin').value,
+    cliente: document.getElementById('cliente').value,
+    tecnico: document.getElementById('tecnico').value,
+    fecha: document.getElementById('fecha').value,
+    estado_general: document.getElementById('estado_general').value,
+    observaciones: document.getElementById('observaciones').value
+  };
 
-      // Guardar registro en Supabase
-      const { data, error } = await client
-        .from('informes_geometria')
-        .insert([payload])
-        .select();
+  try {
+    // Guardar especifícando el esquema público de forma explícita
+    const { data, error } = await client
+      .from('informes_geometria')
+      .insert([payload])
+      .select('id'); // Pedir explícitamente solo el ID para no saturar la caché
 
-      btn.disabled = false;
-      btn.classList.remove('opacity-50');
+    if (error) throw error;
 
-      if (error) {
-        alert('Error al guardar el informe en la BD: ' + error.message);
-      } else {
-        if (data && data[0]?.id) {
-          document.getElementById('folio').innerText = `FOL-${data[0].id}`;
-        }
-        
-        // Abre la ventana de impresión/Guardado PDF de inmediato
-        window.print();
-      }
-    });
+    if (data && data[0]?.id) {
+      document.getElementById('folio').innerText = `FOL-${data[0].id}`;
+    }
+    
+    // Imprimir tras confirmar guardado
+    window.print();
+
+  } catch (error) {
+    console.error('Error al guardar:', error);
+    alert('Error al guardar en BD: ' + (error.message || 'Error de caché en el esquema'));
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('opacity-50');
+  }
+});
+
+
   </script>
 </body>
 </html>
