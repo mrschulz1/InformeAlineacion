@@ -398,34 +398,31 @@
           }
         });
 
-        if (response.status === 429) {
-          throw new Error('LIMIT_EXCEEDED');
-        }
-
-        if (!response.ok) {
-          throw new Error(`HTTP_${response.status}`);
-        }
+        if (response.status === 429) throw new Error('LIMIT_EXCEEDED');
+        if (!response.ok) throw new Error(`HTTP_${response.status}`);
 
         const resData = await response.json();
+        // Muestra la respuesta en consola para depuración
+        console.log("Respuesta de Boostr API:", resData);
+
         const vehicle = resData.data || resData;
 
         if (vehicle) {
-          // Extraer Marca, Modelo, Año y VIN / Chasis directamente desde el objeto JSON
-          const marca = vehicle.brand || vehicle.marca || '';
+          // Mapeo exhaustivo de posibles llaves retornadas por Boostr / Registro
+          const marca = vehicle.brand || vehicle.marca || vehicle.make || '';
           const modelo = vehicle.model || vehicle.modelo || '';
-          const anio = vehicle.year || vehicle.anio || '';
-          const vin = vehicle.vin || vehicle.chasis || vehicle.chassis_number || vehicle.nro_chasis || '';
+          const anio = vehicle.year || vehicle.anio || vehicle.year_model || '';
+          const vin = vehicle.vin || vehicle.chasis || vehicle.chassis || vehicle.chassis_number || vehicle.nro_chasis || vehicle.serial_number || '';
 
-          document.getElementById('marca').value = marca.toUpperCase();
-          document.getElementById('modelo').value = modelo.toUpperCase();
-          document.getElementById('anio').value = anio;
-          document.getElementById('vin').value = vin.toUpperCase();
+          document.getElementById('marca').value = String(marca).toUpperCase();
+          document.getElementById('modelo').value = String(modelo).toUpperCase();
+          document.getElementById('anio').value = String(anio);
+          document.getElementById('vin').value = String(vin).toUpperCase();
 
           loadingPatente.innerText = '✓ Datos de vehículo cargados';
           loadingPatente.classList.remove('text-indigo-600');
           loadingPatente.classList.add('text-emerald-600');
 
-          // Mueve el foco directamente al campo Cliente para completarlo manualmente
           document.getElementById('cliente').focus();
         } else {
           throw new Error('NOT_FOUND');
@@ -443,20 +440,11 @@
         loadingPatente.classList.remove('text-indigo-600', 'text-emerald-600');
         loadingPatente.classList.add('text-amber-600');
 
-        // Limpia campos opcionales para ingreso manual
-        document.getElementById('marca').value = '';
-        document.getElementById('modelo').value = '';
-        document.getElementById('anio').value = '';
-        document.getElementById('vin').value = '';
-
         document.getElementById('cliente').focus();
       } finally {
         setTimeout(() => loadingPatente.classList.add('hidden'), 4000);
       }
     }
-
-    inputPatente.addEventListener('blur', buscarDatosVehiculo);
-    inputPatente.addEventListener('change', buscarDatosVehiculo);
 
     // 3. SEMÁFORO INTERACTIVO
     function setStatus(btn) {
