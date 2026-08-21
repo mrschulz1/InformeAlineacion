@@ -332,10 +332,16 @@
     lucide.createIcons();
 
     // Configuración de Supabase
+    // Configuración de Supabase forzando el esquema public
     const SUPABASE_URL = "https://okkydrwdexacxvfbtopb.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_XY2XRiAQw4tQdygSAwd4XA_pRETQ_EA";
     const { createClient } = supabase;
-    const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      db: {
+        schema: 'public'
+      }
+    });
 
     // Token Boostr API
     const BOOST_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnQiOiJWSUNUT1IgTSBTIE1JUkFOREEiLCJwbGFuIjoiZnJlZSIsImFkZG9ucyI6IiIsImV4Y2x1ZGVzIjoiIiwicmF0ZSI6IjV4MTAiLCJjdXN0b20iOnsiZG9jdW1lbnRfbnVtYmVyX2RhaWx5X2xpbWl0IjowLCJwbGF0ZXNfZGFpbHlfbGltaXQiOjV9LCJpYXQiOjE3ODY5OTkyMzMsImV4cCI6MTc4OTU5MTIzM30.glMjAi_WhmMWBOdgylX1SI7m5AVbAQ6HI7QMRYatvQ4";
