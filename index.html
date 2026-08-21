@@ -354,35 +354,96 @@
     verificarSesion();
 
     // 2. BUSQUEDA Y AUTO-RELLENADO DESDE TABLA 'ORDENES' (VALES)
-    async function buscarDatosVale() {
-      const patenteVal = inputPatente.value.toUpperCase().trim();
-      if (!patenteVal || patenteVal.length < 4) return;
 
-      loadingPatente.classList.remove('hidden');
+    const BOOST_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnQiOiJWSUNUT1IgTSBTIE1JUkFOREEiLCJwbGFuIjoiZnJlZSIsImFkZG9ucyI6IiIsImV4Y2x1ZGVzIjoiIiwicmF0ZSI6IjV4MTAiLCJjdXN0b20iOnsiZG9jdW1lbnRfbnVtYmVyX2RhaWx5X2xpbWl0IjowLCJwbGF0ZXNfZGFpbHlfbGltaXQiOjV9LCJpYXQiOjE3ODY5OTkyMzMsImV4cCI6MTc4OTU5MTIzM30.glMjAi_WhmMWBOdgylX1SI7m5AVbAQ6HI7QMRYatvQ4";
 
-      const { data: vales, error } = await client
-        .from('ordenes')
-        .select('nombre_empresa, marca')
-        .eq('patente', patenteVal)
-        .order('id', { ascending: false })
-        .limit(1);
+      async function buscarDatosVale() {
+        const patenteVal = inputPatente.value.toUpperCase().trim();
+        if (!patenteVal || patenteVal.length < 4) return;
 
-      loadingPatente.classList.add('hidden');
+        loadingPatente.innerText = '🔎 Buscando vehículo...';
+        loadingPatente.classList.remove('hidden', 'text-amber-600', 'text-emerald-600');
+        loadingPatente.classList.add('text-indigo-600');
 
-      if (error) {
-        console.error('Error al consultar vale:', error);
-        return;
+        try {
+          // 1. PASO 1: Consulta en Supabase (Ahorra las 5 consultas diarias)
+          const { data: vales, error: errorSupabase } = await client
+            .from('ordenes')
+            .select('nombre_empresa, marca')
+            .eq('patente', patenteVal)
+            .order('id', { ascending: false })
+            .limit(1);
+
+          if (!errorSupabase && vales && vales.length > 0) {
+            if (vales[0].nombre_empresa) document.getElementById('cliente').value = vales[0].nombre_empresa;
+            if (vales[0].marca) document.getElementById('modelo').value = vales[0].marca;
+
+            loadingPatente.innerText = '✓ Cargado desde historial del taller';
+            loadingPatente.classList.remove('text-indigo-600');
+            loadingPatente.classList.add('text-emerald-600');
+            document.getElementById('cliente').focus();
+            return; // Finaliza si lo encontró localmente
+          }
+
+          // 2. PASO 2: Si no está registrado en el taller, consulta Boostr API
+          loadingPatente.innerText = '🌐 Vehículo nuevo: Consultando Boostr API...';
+
+          const response = await fetch(`https://api.boostr.cl/vehicle/${patenteVal}.json`, {
+            method: 'GET',
+            headers: {
+              'X-API-KEY': BOOST_API_KEY,
+              'accept': 'application/json'
+            }
+          });
+
+          if (response.status === 429) {
+            throw new Error('LIMIT_EXCEEDED');
+          }
+
+          if (!response.ok) {
+            throw new Error(`HTTP_${response.status}`);
+          }
+
+          const resData = await response.json();
+          const vehicle = resData.data || resData;
+
+          if (vehicle && (vehicle.brand || vehicle.marca || vehicle.model || vehicle.modelo)) {
+            const marca = vehicle.brand || vehicle.marca || '';
+            const modelo = vehicle.model || vehicle.modelo || '';
+            const anio = vehicle.year || vehicle.anio || '';
+
+            const textoVehiculo = `${marca} ${modelo} ${anio}`.trim().toUpperCase();
+
+            document.getElementById('modelo').value = textoVehiculo;
+
+            loadingPatente.innerText = '✓ Vehículo encontrado en API Boostr';
+            loadingPatente.classList.remove('text-indigo-600');
+            loadingPatente.classList.add('text-emerald-600');
+
+            document.getElementById('cliente').focus();
+          } else {
+            throw new Error('NOT_FOUND');
+          }
+
+        } catch (error) {
+          console.warn('Resultado de búsqueda:', error.message);
+
+          // Mensajes adaptados según la falla
+          if (error.message === 'LIMIT_EXCEEDED') {
+            loadingPatente.innerText = '⚠️ Límite diario de API alcanzado (5/5). Ingresa datos a mano.';
+          } else {
+            loadingPatente.innerText = 'ℹ️ Vehículo no registrado. Ingresa datos manualmente.';
+          }
+
+          loadingPatente.classList.remove('text-indigo-600', 'text-emerald-600');
+          loadingPatente.classList.add('text-amber-600');
+
+          document.getElementById('modelo').value = '';
+          document.getElementById('cliente').focus();
+        } finally {
+          setTimeout(() => loadingPatente.classList.add('hidden'), 4000);
+        } 
       }
-
-      if (vales && vales.length > 0) {
-        const vale = vales[0];
-        if (vale.nombre_empresa) document.getElementById('cliente').value = vale.nombre_empresa;
-        if (vale.marca) document.getElementById('modelo').value = vale.marca;
-      }
-    }
-
-    inputPatente.addEventListener('blur', buscarDatosVale);
-    inputPatente.addEventListener('change', buscarDatosVale);
 
     // 3. SEMÁFORO INTERACTIVO
     function setStatus(btn) {
