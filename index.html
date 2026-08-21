@@ -388,21 +388,17 @@
 
     // 2. BUSQUEDA EXCLUSIVA EN BOOSTR API (MARCA, MODELO, AÑO, VIN)
     // BUSQUEDA EXCLUSIVA EN BOOSTR API
+    // BUSQUEDA EXCLUSIVA EN BOOSTR API
     async function buscarDatosVehiculo() {
-      // Asegurar captura limpia de la patente
       const inputEl = document.getElementById('patente');
       if (!inputEl) return;
 
       const patenteVal = inputEl.value.toUpperCase().replace(/[^A-Z0-9]/g, '').trim();
-      
-      // Validar largo mínimo de patente chilena (4 a 6 caracteres)
       if (patenteVal.length < 4) return;
 
       loadingPatente.innerText = '🌐 Consultando API...';
       loadingPatente.classList.remove('hidden', 'text-amber-600', 'text-emerald-600');
       loadingPatente.classList.add('text-indigo-600');
-
-      console.log("Iniciando consulta para la patente:", patenteVal);
 
       try {
         const response = await fetch(`https://api.boostr.cl/vehicle/${patenteVal}.json`, {
@@ -413,29 +409,38 @@
           }
         });
 
-        console.log("Estado de la respuesta HTTP:", response.status);
-
         if (response.status === 429) throw new Error('LIMIT_EXCEEDED');
         if (!response.ok) throw new Error(`HTTP_${response.status}`);
 
         const resData = await response.json();
-        console.log("Respuesta obtenida de la API:", resData);
+        console.log("Respuesta completa API:", resData);
 
-        const vehicle = resData.data || resData;
+        // Extraer la propiedad principal del vehículo o la raíz
+        const v = resData.data || resData;
 
-        if (vehicle) {
-          // Extraer datos con fallback para distintos nombres de llaves
-          const marca = vehicle.brand || vehicle.marca || vehicle.make || '';
-          const modelo = vehicle.model || vehicle.modelo || '';
-          const anio = vehicle.year || vehicle.anio || vehicle.year_model || '';
-          const vin = vehicle.vin || vehicle.chasis || vehicle.chassis || vehicle.chassis_number || vehicle.nro_chasis || vehicle.serial_number || '';
+        if (v) {
+          // 1. Extracción de Marca, Modelo y Año
+          const marca = v.brand || v.marca || v.make || '';
+          const modelo = v.model || v.modelo || '';
+          const anio = v.year || v.anio || v.year_model || '';
+
+          // 2. Extracción profunda de VIN / Chasis
+          const vin = v.vin || 
+                      v.chasis || 
+                      v.chassis || 
+                      v.chassis_number || 
+                      v.nro_chasis || 
+                      v.serial_number || 
+                      v.stamped_chassis ||
+                      (v.extra && (v.extra.chassis || v.extra.vin)) ||
+                      '';
 
           document.getElementById('marca').value = String(marca).toUpperCase();
           document.getElementById('modelo').value = String(modelo).toUpperCase();
           document.getElementById('anio').value = String(anio);
           document.getElementById('vin').value = String(vin).toUpperCase();
 
-          loadingPatente.innerText = '✓ Datos de vehículo cargados';
+          loadingPatente.innerText = '✓ Datos cargados';
           loadingPatente.classList.remove('text-indigo-600');
           loadingPatente.classList.add('text-emerald-600');
 
@@ -445,7 +450,7 @@
         }
 
       } catch (error) {
-        console.warn('Detalle del error en API:', error.message);
+        console.warn('Detalle error API:', error.message);
 
         if (error.message === 'LIMIT_EXCEEDED') {
           loadingPatente.innerText = '⚠️ Límite de API alcanzado. Ingresa datos a mano.';
@@ -461,20 +466,6 @@
         setTimeout(() => loadingPatente.classList.add('hidden'), 4000);
       }
     }
-
-    // Asignación de múltiples eventos para asegurar la ejecución
-    const elPatente = document.getElementById('patente');
-
-    // Se activa al salir del campo
-    elPatente.addEventListener('blur', buscarDatosVehiculo);
-
-    // Se activa al presionar Enter dentro del cuadro de texto
-    elPatente.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault(); // Evita que se envie el formulario antes de tiempo
-        buscarDatosVehiculo();
-      }
-    });
 
     // 3. SEMÁFORO INTERACTIVO
     function setStatus(btn) {
